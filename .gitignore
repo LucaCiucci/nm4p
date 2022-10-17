@@ -1,4 +1,7 @@
-CMakeLists.txt.user
+################################################################
+#                 GitHub DEFAULT for CMake
+################################################################
+
 CMakeCache.txt
 CMakeFiles
 CMakeScripts
@@ -8,4 +11,19 @@ cmake_install.cmake
 install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
-_deps
+
+################################################################
+#                       ADDITIONALS
+################################################################
+# Manually inserted ignores goes here
+
+out/
+
+.vs/
+
+build/
+
+################################################################
+#                       GitHub inserted
+################################################################
+# Automatically inserted ignores goes here

@@ -1,0 +1,108 @@
+
+//typedef unsigned int uint32;
+//#define UINT32_MAX UINT_MAX
+
+// https://en.wikipedia.org/wiki/Xorshift
+typedef struct _xorshift32_state {
+	unsigned a;
+} xorshift32_state;
+
+/* The state word must be initialized to non-zero */
+unsigned xorshift32(xorshift32_state *state)
+{
+	/* Algorithm "xor" from p. 4 of Marsaglia, "Xorshift RNGs" */
+	unsigned x = state->a;
+	x ^= x << 13;
+	x ^= x >> 17;
+	x ^= x << 5;
+	return state->a = x;
+}
+
+float rand_real(float min, float max, xorshift32_state* state)
+{
+	return min + (max - min) * (float)xorshift32(state) / (float)UINT_MAX;
+}
+
+bool getSpin(int i, int j, global const unsigned char* lattice, size_t N, size_t M)
+{
+	i = i % N;
+	j = j % M;
+	const size_t index = i * M + j;
+	const size_t char_index = index / 8;
+	const size_t bit_index = index % 8;
+	return (lattice[char_index] >> bit_index) & 1;
+}
+
+void setSpin(size_t i, size_t j, bool spin, global unsigned char* lattice, size_t N, size_t M)
+{
+	const size_t index = i * M + j;
+	const size_t char_index = index / 8;
+	const size_t bit_index = index % 8;
+	if (spin)
+		lattice[char_index] |= 1 << bit_index;
+	else
+		lattice[char_index] &= ~(1 << bit_index);
+}
+
+void kernel metro_step(global unsigned char* lattice, global const unsigned* rand_seeds, unsigned N, unsigned M, const float beta, int parity)
+{
+	size_t id = get_global_id(0);
+
+	// init rand seed
+	xorshift32_state state;
+
+	// set the random seed based on the global id
+	// we use id*id because id seems to be a bit too regular
+	// TODO: use a better seed
+	state.a = id;
+	for (int i = 0; i < 32; ++i)
+		if (id & (1 << i))
+			state.a ^= rand_seeds[i];
+	//for (int i = 0; i < 10; ++i)
+	//	xorshift32(&state);
+
+	//lattice[get_global_id(0)] = (unsigned char)(rand_real(0, 1) < 0.5f) ? 0u : 1u;
+
+
+	//for (int parity = 0; parity < 2; ++parity)
+	{
+		for (size_t k = 0; k < 8; ++k)
+		{
+			const size_t pt_index = id * 8 + k;
+			const size_t i = pt_index / M;
+			const size_t j = pt_index % M;
+
+			if (i >= N || j >= M)
+				continue;
+
+			if ((i + j) % 2 != parity || false)
+				continue;
+
+			const bool spin_bool = getSpin(i, j, lattice, N, M);
+			const int spin = spin_bool ? 1 : -1;
+
+			int neighbors = 0;
+			neighbors += getSpin(i - 1, j, lattice, N, M) ? 1 : -1;
+			neighbors += getSpin(i + 1, j, lattice, N, M) ? 1 : -1;
+			neighbors += getSpin(i, j - 1, lattice, N, M) ? 1 : -1;
+			neighbors += getSpin(i, j + 1, lattice, N, M) ? 1 : -1;
+
+			const float p = exp(-2.f * beta * spin * neighbors);
+
+			if (rand_real(0, 1, &state) < p)
+				setSpin(i, j, !spin_bool, lattice, N, M);
+
+			//for (int i = 0; i < 32; ++i)
+			//	xorshift32(&state);
+
+			//lattice[(i * M + j) / 8] = pt_index % 2;
+			//setSpin(i, j, (i + j) % 2, lattice, N, M);
+			//setSpin(i, j, rand_real(0, 1, &state) < 0.25f, lattice, N, M);
+		}
+
+		//barrier(CLK_GLOBAL_MEM_FENCE);
+	}
+
+	//setSpin(i, j, rand_real(0, 1, &state) < 0.5f, lattice, N, M);
+	//setSpin(i, j, true, lattice, N, M);
+}
