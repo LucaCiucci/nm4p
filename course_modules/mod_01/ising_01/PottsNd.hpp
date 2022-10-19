@@ -8,6 +8,8 @@
 #include <array>
 #include <ostream>
 #include <string>
+//#include <bitset>
+#include <cassert>
 
 #include <stdint.h>
 
@@ -32,6 +34,142 @@ namespace nm4p
 		using std::array<T, S>::array;
 	};
 
+	template <class T>
+	struct PackedVector : std::vector<T>
+	{
+		using std::vector<T>::vector;
+
+		T* rawData() { return this->data(); }
+		const T* rawData() const { return this->data(); }
+	};
+
+	// TODO su libreria
+	template <class T>
+	struct BitReference
+	{
+		constexpr BitReference(BitReference&&) = default;
+		constexpr BitReference(const BitReference&) = default;
+
+		constexpr BitReference(T* data, int idx) : m_data(data), m_idx(idx) {
+			//assert(idx > 0);
+			//assert(idx < sizeof(T));
+		};
+
+		constexpr operator bool() const {
+			auto p8 = (const uint8_t*)(const void*)m_data;
+			p8 += m_idx / 8;
+			return (*p8) & (1 << (m_idx % 8));
+		}
+
+		constexpr BitReference& operator=(bool value) /*requires (!std::is_const<T>)*/ {
+			auto p8 = (uint8_t*)(void*)m_data;
+			p8 += m_idx / 8;
+			if (value)
+				*p8 |= 1 << (m_idx % 8);
+			else
+				*p8 &= ~(1 << (m_idx % 8));
+			return *this;
+		}
+
+	private:
+		T* const m_data = nullptr;
+		const int m_idx = 0;
+	};
+
+	template <class T>
+	struct BitReferenceIt
+	{
+		using iterator_category = typename std::forward_iterator_tag;
+		using difference_type = std::ptrdiff_t;
+		using value_type = BitReference<T>;
+		using pointer = BitReference<T>*; // TODO see std::vector<bool>::iterator!!!
+		using reference = BitReference<T>&; // TODO see std::vector<bool>::iterator!!!
+
+		constexpr BitReferenceIt(BitReferenceIt&&) = default;
+		constexpr BitReferenceIt(const BitReferenceIt&) = default;
+
+		constexpr BitReferenceIt(T* data, int idx) : m_data(data), m_idx(idx) {};
+
+		constexpr BitReferenceIt& operator=(BitReferenceIt&&) = default;
+		constexpr BitReferenceIt& operator=(const BitReferenceIt&) = default;
+
+		constexpr BitReferenceIt& operator++() {
+			++m_idx;
+			return *this;
+		}
+
+		constexpr bool operator==(const BitReferenceIt& other) const { return m_data == other.m_data && m_idx == other.m_idx; }
+
+		constexpr value_type operator*() {
+			return BitReference<T>(m_data, m_idx);
+		}
+
+	private:
+		T* const m_data = nullptr;
+		int m_idx = 0;
+	};
+
+	// we do not use bitsets because its size is platform dependant
+	template <>
+	struct PackedVector<bool> : private std::vector<uint8_t>
+	{
+		using reference = BitReference<uint8_t>;
+		using const_reference = BitReference<const uint8_t>;
+
+		reference operator[](size_t index) {
+			return reference(this->data() + index / 8, index % 8);
+		}
+		const_reference operator[](size_t index) const {
+			return const_reference(this->data() + index / 8, index % 8);
+		}
+
+		reference at(size_t index) {
+			// TODO checks
+			return (*this)[index];
+		}
+		const_reference at(size_t index) const {
+			// TODO checks
+			return (*this)[index];
+		}
+
+		void clear() {
+			_base::clear();
+			m_size = 0;
+		}
+
+		void resize(size_t size) {
+			_base::resize((size + 7) / 8);
+			m_size = size;
+		}
+
+		size_t size() const {
+			return m_size;
+		}
+
+		BitReferenceIt<uint8_t> begin() {
+			return BitReferenceIt<uint8_t>(this->data(), 0);
+		}
+
+		BitReferenceIt<const uint8_t> begin() const {
+			return BitReferenceIt<const uint8_t>(this->data(), 0);
+		}
+
+		BitReferenceIt<uint8_t> end() {
+			return BitReferenceIt<uint8_t>(this->data(), this->size());
+		}
+
+		BitReferenceIt<const uint8_t> end() const {
+			return BitReferenceIt<const uint8_t>(this->data(), this->size());
+		}
+
+		uint8_t* rawData() { return (uint8_t*)this->data(); }
+		const uint8_t* rawData() const { return (uint8_t*)this->data(); }
+
+	private:
+		using _base = std::vector<uint8_t>;
+		size_t m_size = 0;
+	};
+
 	template <size_t _NDim, typename _Ty = std::uint8_t, class _coupling = decltype([](_Ty a, _Ty b) -> double { return a == b ? 1 : 0; }) >
 	class PottsNd
 	{
@@ -49,7 +187,7 @@ namespace nm4p
 		PottsNd(PottsNd&& other) = default;
 
 		const _Ty& maxSpin() const { return m_maxSpin; }
-		const array<size_t, _NDim>& shape() const { return m_shape; }
+		const Shape& shape() const { return m_shape; }
 
 		size_t spinCount(void) const { return lc::experimental::product(m_shape); }
 
@@ -63,9 +201,24 @@ namespace nm4p
 		auto at(const Index& idx);
 		auto at(const Index& idx) const;
 
+		auto& dataContainer() {
+			return m_data;
+		}
+
+		const auto& dataContainer() const {
+			return m_data;
+		}
+
 		void randomize(std::default_random_engine& engine);
 
 		void randomize();
+
+		auto rawData() {
+			return m_data.rawData();
+		}
+		auto rawData() const {
+			return m_data.rawData();
+		}
 
 	private:
 
@@ -73,7 +226,7 @@ namespace nm4p
 		size_t m_M = 0;
 
 		// we store data in a vector of bool that is PACKED
-		std::vector<bool> m_data;
+		PackedVector<_Ty> m_data;
 
 		const _Ty m_maxSpin = 0;
 		Shape m_shape;
@@ -136,6 +289,9 @@ namespace nm4p
 
 	std::ostream& operator<<(std::ostream& os, const Ising2d& ising);
 	std::string reset_cursor(const Ising2d& ising);
+
+	// computes the average of the spins in the lattice
+	double magnetization(const Ising2d& model);
 }
 
 // ================================================================================================================================

@@ -13,7 +13,10 @@ target_sources(ising_01 PRIVATE
 	"opencl_utils.cpp"
 	"NeighborsIterator.hpp"
     "Potts2dItem.cpp"
-    "Potts2dItem.hpp")
+    "Potts2dItem.hpp"
+	"steppers.cpp"
+	"steppers.hpp"
+)
 
 # always false
 if (FALSE)
@@ -40,6 +43,12 @@ if (OpenCL_FOUND)
 	target_compile_definitions(ising_01 PRIVATE ISING_OPENCL)
 endif()
 
+qt_add_resources(ising_01 "opencl_programs"
+    PREFIX "/opencl/"
+    FILES
+        a.ocl
+)
+
 set_property(TARGET ising_01 PROPERTY CXX_STANDARD 20)
 
 target_link_libraries(ising_01 PRIVATE nm4pLib)
@@ -59,7 +68,7 @@ target_link_libraries(ising_01 PRIVATE Qt6::Core Qt6::Widgets)
 
 # !!!!!!!!!!!!!!!!!!11
 add_executable(tmp)
-target_sources(tmp PRIVATE tmp.cpp "opencl_utils.cpp"    "Potts2dItem.cpp")
+target_sources(tmp PRIVATE tmp.cpp "opencl_utils.cpp"    "Potts2dItem.cpp" "steppers.cpp")
 set_property(TARGET tmp PROPERTY CXX_STANDARD 20)
 
 find_package(ROOT)

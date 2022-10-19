@@ -32,4 +32,12 @@ namespace nm4p
 			result += cursor_up;
 		return result;
 	}
+
+	double magnetization(const Ising2d& model)
+	{
+		double sum = 0;
+		for (bool s : model.dataContainer())
+			sum += s ? 1 : -1;
+		return sum / lc::experimental::product(model.shape());
+	}
 }

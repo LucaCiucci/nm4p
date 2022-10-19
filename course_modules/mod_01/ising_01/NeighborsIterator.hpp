@@ -27,8 +27,8 @@ namespace nm4p
 		using iterator_category = typename std::forward_iterator_tag;
 		using difference_type = std::ptrdiff_t;
 		using value_type = IdxValuePair;
-		using pointer = IdxValuePair*;
-		using reference = IdxValuePair&;
+		using pointer = IdxValuePair*; // TODO see std::vector<bool>::iterator!!!
+		using reference = IdxValuePair&; // TODO see std::vector<bool>::iterator!!!
 
 		static constexpr size_t NDim() { return _NDim; }
 

@@ -40,13 +40,26 @@ namespace nm4p
 
 	void Potts2dItem::showModel(const Ising2d& model)
 	{
+		// TMP
+		if (0) {
+			QImage img(model.M(), model.N(), QImage::Format::Format_MonoLSB);
+			//QImage img((const uchar*)model.rawData(), model.M(), model.N(), QImage::Format::Format_MonoLSB);
+			//img.bits()
+			std::memcpy(img.bits(), model.rawData(), (model.M() * model.N() + 7) / 8);
+			emit this->newImage(img);
+			return;
+		}
+
 		QImage img(model.M(), model.N(), QImage::Format::Format_ARGB32);
 
-		for (size_t y = 0; y < model.N(); ++y)
-			for (size_t x = 0; x < model.M(); ++x)
+		for (size_t i = 0; i < model.N(); ++i)
+			for (size_t j = 0; j < model.M(); ++j)
 			{
+				const auto& x = j;
+				const auto& y = i;
+
 				//auto color = model[{x, y}] ? qRgb(255, 0, 0) : qRgb(0, 255, 0);
-				auto color = model[{x, y}] ? qRgb(255, 255, 255) : qRgb(0, 0, 0);
+				auto color = model[{i, j}] ? qRgb(255, 255, 255) : qRgb(0, 0, 0);
 				img.setPixel(QPoint{ (int)x, (int)y }, color);
 			}
 
