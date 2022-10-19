@@ -10,7 +10,6 @@ namespace nm4p
 {
 	std::pair<std::unique_ptr<cl::Context>, std::vector<cl::Device>> init_CL_context()
 	{
-
 		// https://ulhpc-tutorials.readthedocs.io/en/latest/gpu/opencl/
 
 		std::vector<cl::Platform> all_platforms;

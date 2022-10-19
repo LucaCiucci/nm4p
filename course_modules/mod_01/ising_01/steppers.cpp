@@ -9,7 +9,6 @@
 
 namespace nm4p
 {
-
 	void SimpleMetropolisIsingStepper::step(std::default_random_engine& engine)
 	{
 		auto& model = this->model();

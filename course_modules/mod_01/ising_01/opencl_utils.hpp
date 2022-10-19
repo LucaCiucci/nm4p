@@ -9,7 +9,6 @@
 
 namespace nm4p
 {
-
 	std::pair<std::unique_ptr<cl::Context>, std::vector<cl::Device>> init_CL_context();
 }
 

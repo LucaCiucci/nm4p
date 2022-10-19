@@ -35,20 +35,26 @@ using namespace std::string_literals;
 using namespace nm4p;
 
 #undef max
+//#undef ISING_OPENCL
+
+#ifdef ISING_OPENCL
+#define IF_ISING_OPENCL(x) x
+#else 
+#define IF_ISING_OPENCL(x)
+#endif
 
 // "D:/LUCA/unipi/metodi_numerici/codici/nm4p/course_modules/mod_01/ising_01/a.ocl"
 
 int main(int argc, char** argv)
 {
-	//constexpr int _a = -12;
-	//constexpr size_t _b = 10;
-	//constexpr int d = _a % (int)_b;
 	std::cout << "Hello There!" << std::endl;
 
 	QApplication app(argc, argv);
 
-	auto [clctx, devices ] = init_CL_context();
+#ifdef ISING_OPENCL
+	auto [clctx, devices] = init_CL_context();
 	cl::Buffer A_d(*clctx, CL_MEM_READ_WRITE, sizeof(int) * 10);
+#endif // ISING_OPENCL
 
 	std::random_device dev;
 	std::default_random_engine engine(dev());
@@ -61,22 +67,19 @@ int main(int argc, char** argv)
 	model.randomize();
 
 	nm4p::SimpleIsingField field;
-	std::cout << "Ciao " << std::distance(field.begin(), field.end()) << std::endl;
-
-	QImage img;
 
 	PottsGraphicsView v; v.show();
 
 	auto item = new Potts2dItem;
-
 	item->showModel(model);
-	std::cout << std::this_thread::get_id() << std::endl;
 
 	double betaaaa = 4;
 	int stepPauseMs = 0;
 	bool onGPU = false;
 
+#ifdef ISING_OPENCL
 	OpenCLIsingStepper GPU_stepper(model, *clctx, devices[0]);
+#endif // ISING_OPENCL
 	SimpleMetropolisIsingStepper stepper(model);
 
 	std::thread t([&]() {
@@ -100,11 +103,11 @@ int main(int argc, char** argv)
 				//model.randomize(engine);
 				//step(model, model.N() * model.M() * 0.1, beta, engine);
 				//GPU_step(model, model.N() * model.M() * 0.1, betaaaa, *clctx, devices[0], engine);
-				GPU_stepper.repetitions = 1;
+				IF_ISING_OPENCL(GPU_stepper.repetitions = 1);
 				//stepper.steps = 10;
 
 				if (onGPU)
-					GPU_stepper.step(engine);
+					IF_ISING_OPENCL(GPU_stepper.step(engine));
 				else
 					stepper.step(engine);
 
@@ -131,7 +134,7 @@ int main(int argc, char** argv)
 	QSlider slider; slider.setMaximum(1000); QObject::connect(&slider, &QSlider::valueChanged, [&]() {
 		betaaaa = std::lerp(0.2, 0.8, (double)slider.value() / 1000);
 		label.setText(QString::fromStdString(std::format("Beta = {:.3}", betaaaa)));
-		GPU_stepper.setBeta(betaaaa);
+		IF_ISING_OPENCL(GPU_stepper.setBeta(betaaaa));
 		stepper.setBeta(betaaaa);
 		});
 	slider.setOrientation(Qt::Horizontal);
