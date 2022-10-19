@@ -4,10 +4,10 @@ find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
 qt_standard_project_setup()
 
 
-add_executable(ising_01)
+add_executable(ising_demo_01)
 
-target_sources(ising_01 PRIVATE
-	"main.cpp"
+target_sources(ising_demo_01 PRIVATE
+	"main_demo.cpp"
 	"PottsNd.hpp"
 	"PottsNd.cpp"
 	"opencl_utils.cpp"
@@ -18,7 +18,7 @@ target_sources(ising_01 PRIVATE
 	"steppers.hpp"
 )
 
-# always false
+# just a test, not used
 if (FALSE)
 	enable_language(CUDA)
 	include(CheckLanguage)
@@ -29,7 +29,7 @@ if (FALSE)
 		set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 	endif()
 
-	target_sources(ising_01 PRIVATE
+	target_sources(ising_demo_01 PRIVATE
 		"a.cu"
 	)
 endif()
@@ -38,23 +38,23 @@ endif()
 
 find_package(OpenCL) # find_package(OpenCL REQUIRED)
 if (OpenCL_FOUND)
-	message("OpenCL found, linking ising_01 to OpenCL")
-	target_link_libraries(ising_01 PRIVATE OpenCL::OpenCL)
-	target_compile_definitions(ising_01 PRIVATE ISING_OPENCL)
+	message("OpenCL found, linking ising_demo_01 to OpenCL")
+	target_link_libraries(ising_demo_01 PRIVATE OpenCL::OpenCL)
+	target_compile_definitions(ising_demo_01 PRIVATE ISING_OPENCL)
 endif()
 
-qt_add_resources(ising_01 "opencl_programs"
+qt_add_resources(ising_demo_01 "opencl_programs"
     PREFIX "/opencl/"
     FILES
         a.ocl
 )
 
-set_property(TARGET ising_01 PROPERTY CXX_STANDARD 20)
+set_property(TARGET ising_demo_01 PROPERTY CXX_STANDARD 20)
 
-target_link_libraries(ising_01 PRIVATE nm4pLib)
+target_link_libraries(ising_demo_01 PRIVATE nm4pLib)
 
 #find_package(gnuplotpp REQUIRED)
-#target_link_libraries(ising_01 PRIVATE gnuplotpp)
+#target_link_libraries(ising_demo_01 PRIVATE gnuplotpp)
 
 
 set(CMAKE_AUTOUIC ON)
@@ -62,7 +62,7 @@ set(CMAKE_AUTOMOC ON) #??
 set(CMAKE_AUTORCC ON) #??
 
 
-target_link_libraries(ising_01 PRIVATE Qt6::Core Qt6::Widgets)
+target_link_libraries(ising_demo_01 PRIVATE Qt6::Core Qt6::Widgets)
 
 
 
