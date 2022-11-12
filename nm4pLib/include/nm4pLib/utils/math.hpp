@@ -28,4 +28,40 @@ namespace lc::experimental
 	inline constexpr T abs(const T& x) {
 		return x >= 0 ? x : -x;
 	}
+
+	// periodi index
+	inline int periodicIndex(int i, int N) {
+		if (i < 0)
+			return (N + (i % N)) % N;
+		return i % N;
+	}
+}
+
+namespace nm4p
+{
+	template <class T = double>
+	class AverageAccumulator
+	{
+	public:
+
+		AverageAccumulator& operator<< (const T& x) {
+			m_sum += x;
+			++m_count;
+			return *this;
+		}
+
+		T average() const {
+			return m_sum / m_count;
+		}
+
+		T value() const { return this->average(); }
+		T operator()() const { return this->average(); }
+
+	private:
+
+		T m_sum = 0;
+		size_t m_count = 0;
+	};
+	// deduction guideline (i.e. default is double) https://en.cppreference.com/w/cpp/language/class_template_argument_deduction
+	AverageAccumulator()->AverageAccumulator<>;
 }
