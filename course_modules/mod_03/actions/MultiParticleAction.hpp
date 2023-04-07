@@ -20,7 +20,7 @@ namespace nm4p
 		vector<double> masses;
 
 		double kin(size_t i, size_t N) const override;
-		double veff(const span<const double>& yy) const override;
+		double veff(const span<const double>& yy, size_t N) const override;
 		
 	private:
 		

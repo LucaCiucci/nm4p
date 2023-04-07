@@ -220,6 +220,9 @@ namespace nm4p
 			return m_data.rawData();
 		}
 
+		static constexpr double coupling(const _Ty& first, const _Ty& second) { return _coupling()(first, second); }
+		double coupling(const Index& first, const Index& second) { return this->coupling((*this)[first], (*this)[second]); }
+
 	private:
 
 		size_t m_N = 0;

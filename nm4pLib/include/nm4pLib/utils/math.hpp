@@ -57,6 +57,11 @@ namespace nm4p
 		T value() const { return this->average(); }
 		T operator()() const { return this->average(); }
 
+		void reset() {
+			m_sum = 0;
+			m_count = 0;
+		}
+
 	private:
 
 		T m_sum = 0;

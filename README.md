@@ -9,3 +9,5 @@ Modules:
 ## NOTICE:
 - BRUCIU_NOTICE_BEGIN
 - BRUCIU_NOTICE_END
+
+ciao a tutti, come va?

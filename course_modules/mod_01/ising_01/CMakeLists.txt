@@ -46,7 +46,7 @@ endif()
 qt_add_resources(ising_demo_01 "opencl_programs"
     PREFIX "/opencl/"
     FILES
-        a.ocl
+        a.cl
 )
 
 set_property(TARGET ising_demo_01 PROPERTY CXX_STANDARD 20)

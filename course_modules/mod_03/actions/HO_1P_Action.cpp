@@ -12,7 +12,7 @@ namespace nm4p
 		return 1 / (2 * this->eta);
 	}
 
-	double HO_1P_Action::veff(const span<const double>& yy) const
+	double HO_1P_Action::veff(const span<const double>& yy, size_t N) const
 	{
 		// a quadratic potential
 		double sum_v = 0;

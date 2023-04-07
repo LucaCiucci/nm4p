@@ -162,25 +162,6 @@ int main(int argc, char** argv)
 
 	return app.exec();
 
-
-	//cl::Platform default_platform = all_platforms[0];
-	//std::cout << "Using platform: " << default_platform.getInfo<CL_PLATFORM_NAME>() << "\n";
-
-	for (auto [i, v] : field)
-	{
-		std::cout << i[0] << " " << i[1] << " " << v << std::endl;
-	}
-
-	constexpr auto ss = []() constexpr -> double {
-		double s = 0;
-		nm4p::SimpleIsingField field;
-		for (auto [i, v] : field)
-		{
-			s += v;
-		}
-		return s;
-	}();
-
 	//return 0;
 
 	//auto n = engine();

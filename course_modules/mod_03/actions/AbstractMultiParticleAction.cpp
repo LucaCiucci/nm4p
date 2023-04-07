@@ -25,7 +25,7 @@ namespace nm4p
 				sum_v += this->kin(i, N) * sqr(t[(J + 1) % N][i] - t[J][i]);
 
 			// potential term
-			sum_v += this->veff(t[J]);
+			sum_v += this->veff(t[J], N);
 		}
 
 		return sum_v;
@@ -98,8 +98,8 @@ namespace nm4p
 		if (!kineticOnly)
 		{
 			const auto& J = i0;
-			sum_v += this->veff(testPoint);
-			sum_v -= this->veff(t[J]);
+			sum_v += this->veff(testPoint, N);
+			sum_v -= this->veff(t[J], N);
 		}
 
 		return sum_v;

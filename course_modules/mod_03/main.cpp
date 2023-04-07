@@ -18,6 +18,10 @@
 #include "actions/MultiParticleAction.hpp"
 
 #include <QImage>
+#include <QApplication>
+//#include <QPixmap>
+#include <QLabel>
+#include <QTimer>
 
 namespace nm4p
 {
@@ -45,20 +49,22 @@ int main(int argc, char** argv)
 
 	using namespace nm4p;
 
-	Trajectory t(2, 10000);
-	t[0][0] = -1;
+	Trajectory t(3, 100);
+	//t[0][0] = -1;
+	for (int i = 0; i < t.lenght(); ++i)
+		t[i][0] = -1.1;
 	std::cout << "trajectory" << std::endl;
-	std::cout << t << std::endl;
+	//std::cout << t << std::endl;
 
-	random_engine engine;
+	random_engine engine(2);
 
 	
 	const auto guessProvider = AbstractMultiParticleAction::guessProvider(1, AbstractMultiParticleAction::GuesserKind::Gaussian);
 
 	const auto actionFunctional = HO_1P_Action(0.1);
-	const auto af2 = MultiParticleAction(1.1, [](const Eigen::VectorXd& p) -> double {
+	const auto af2 = MultiParticleAction(10.1, [](const Eigen::VectorXd& p) -> double {
 		auto r2 = p.norm() * p.norm();
-		return r2;
+		//return r2;
 		return -1 / (p.norm() + 0.01*0);
 		}, {1, 1, 1, 1, 1, 1});
 	
@@ -72,13 +78,13 @@ int main(int argc, char** argv)
 		//if (iteration % 10000 == 0 && indexIteration == 0) std::cout << "\n";
 		//if (iteration % 1000 == 0 && indexIteration == 0) std::cout << "x_2_avg = " << x_2_avg() << "\r";
 		
-		if (iteration == 999 && indexIteration == 0) {
+		if ((iteration % 100 == 0) && indexIteration == 0) {
 			for (size_t i = 0; i < trajectory.lenght(); ++i) {
 				// draw a pixel on the image
 				auto x = trajectory[i][0];
 				auto y = trajectory[i][1];
 
-				const double L = 0.25;
+				const double L = 5.5 / 1;
 				const double minXView = -L;
 				const double maxXView = L;
 				const double minYView = -L;
@@ -87,12 +93,20 @@ int main(int argc, char** argv)
 				const double xView = (x - minXView) / (maxXView - minXView);
 				const double yView = (y - minYView) / (maxYView - minYView);
 
+				if (abs(trajectory[i][2]) / L > 0.25)
+					continue;
+
 				const int xImg = xView * img.width();
 				const int yImg = yView * img.height();
 
 				if (xImg >= 0 && xImg < img.width() && yImg >= 0 && yImg < img.height())
 				{
-					img.setPixel(xImg, yImg, 0x00ff00);
+					auto px = img.pixel(xImg, yImg);
+					auto g = qGreen(px);
+					px = qRgb(0, std::min<int>(g + 255 * sqrt(x*x + y*y + trajectory[i][2]* trajectory[i][2]) / (2 * L), 255), 0);
+					img.setPixel(xImg, yImg, px);
+					//img.setPixel(xImg, yImg, 0x00ff00);
+					
 					//auto color = img.pixelColor(xImg, yImg);
 					//color.setRgb(color.red() + 1, color.green() + 1, color.blue() + 1);
 					//img.setPixelColor(xImg, yImg, color);
@@ -113,7 +127,27 @@ int main(int argc, char** argv)
 		return true;
 	};
 
-	metropolis(t, af2, default_index_runner, guessProvider, 1000, callback, engine);
+	//metropolis(t, af2, default_index_runner, guessProvider, 500000, callback, engine);
+
+	QApplication app(argc, argv);
+	QLabel label;
+	label.show();
+	label.setText("ciao");
+	label.setBaseSize(100, 100);
+	
+	label.setPixmap(QPixmap::fromImage(img));
+	//label.setBaseSize(100, 100);
+	QTimer timer;
+	timer.callOnTimeout([&]() {
+		label.setPixmap(QPixmap::fromImage(img));
+		});
+	timer.setInterval(100);
+	timer.start();
+	std::thread thread([&]() {
+		metropolis(t, af2, default_index_runner, guessProvider, 500000 * 100, callback, engine);
+		});
+	thread.detach();
+	auto r = app.exec();
 
 	img.save("ciao.png");
 

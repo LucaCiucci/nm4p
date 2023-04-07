@@ -23,11 +23,11 @@ namespace nm4p
 		return (N) / (2 * this->beta * hbar * hbar) * this->masses[i];
 	}
 	
-	double MultiParticleAction::veff(const span<const double>& yy) const
+	double MultiParticleAction::veff(const span<const double>& yy, size_t N) const
 	{
-		const auto N = yy.size();
-		Eigen::VectorXd xx(N);
-		for (size_t i = 0; i < N; ++i)
+		//const auto N = yy.size();
+		Eigen::VectorXd xx(yy.size());
+		for (size_t i = 0; i < yy.size(); ++i)
 			xx[i] = yy[i];
 		return this->potential(xx) * (this->beta / N);
 	}

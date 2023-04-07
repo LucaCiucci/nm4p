@@ -15,7 +15,7 @@ namespace nm4p
 		double evalDiff(const Trajectory& t, size_t i0, const Trajectory::Point& testPoint) const override;
 
 		virtual double kin(size_t i, size_t N) const = 0;
-		virtual double veff(const span<const double>& xx) const = 0;
+		virtual double veff(const span<const double>& xx, size_t N) const = 0;
 
 		enum class GuesserKind {
 			Uniform,

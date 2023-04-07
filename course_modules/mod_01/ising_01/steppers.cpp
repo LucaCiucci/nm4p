@@ -27,7 +27,7 @@ namespace nm4p
 
 		// Periodic Boundary Conditions
 		auto pbc = [&model](int i, int j) -> Index {
-			return { (size_t)(i % model.N()), (size_t)(j % model.M()) };
+			return { (size_t)periodicIndex(i, model.N()), (size_t)periodicIndex(j, model.M()) };
 		};
 
 		// returns true with probability `p`

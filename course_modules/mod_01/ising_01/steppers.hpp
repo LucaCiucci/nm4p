@@ -7,6 +7,10 @@
 #include <CL/cl.hpp>
 #endif // ISING_OPENCL
 
+#include <nm4pLib/utils/math.hpp>
+
+using lc::experimental::periodicIndex;
+
 namespace nm4p
 {
 	using std::string;
@@ -84,4 +88,68 @@ namespace nm4p
 		static inline constexpr size_t m_N_seeds = 32;
 	};
 #endif // ISING_OPENCL
+
+	template <class PottsModel>
+	class GenericPottsNdMetropolisStepper
+	{
+	public:
+
+		using Index = PottsModel::Index;
+
+		GenericPottsNdMetropolisStepper(PottsModel& model) : m_model(model) { this->steps = model.spinCount(); };
+
+		PottsModel& model() { return m_model; }
+		const PottsModel& model() const { return m_model; }
+
+		int steps = 0;
+
+		void step(std::default_random_engine& engine) {
+
+			auto& model = this->model();
+			constexpr auto NDim = PottsModel::NDim();
+
+			std::array<std::uniform_int_distribution<int>, NDim> index_distributions;
+			std::uniform_real_distribution<double> d(0, 1);
+			for (size_t i = 0; i < NDim; ++i)
+				index_distributions[i] = std::uniform_int_distribution<int>(0, model.shape()[i]);
+
+			// picks a random index in the lattice
+			auto random_index = [&engine, &index_distributions]() -> Index {
+				Index idx;
+				for (size_t i = 0; i < NDim; ++i)
+					idx[i] = index_distributions[i](engine);
+				return idx;
+			};
+
+			// Periodic Boundary Conditions
+			auto pbc = [&model](Index idx) -> Index {
+				for (size_t i = 0; i < NDim; ++i)
+					idx[i] = periodicIndex(idx[i], model.shape()[i]);
+				return idx;
+			};
+
+			// returns true with probability `p`
+			auto trueWithProbability = [&](double p) -> bool {
+				return d(engine) < p;
+			};
+
+			// flips a spin in the lattice
+			auto flipSpin = [&](const Index& idx) {
+				model[idx] = !model[idx];
+			};
+
+			for (int t = 0; t < this->steps; ++t)
+			{
+				const auto index = random_index();
+			}
+		}
+
+	private:
+
+	private:
+		PottsModel& m_model;
+	};
+
+
+
 }

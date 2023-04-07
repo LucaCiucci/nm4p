@@ -10,7 +10,7 @@ namespace nm4p
 		HO_1P_Action(double eta) : eta(eta) {}
 
 		double kin(size_t i, size_t N) const override;
-		double veff(const span<const double>& yy) const override;
+		double veff(const span<const double>& yy, size_t N) const override;
 
 	public:
 
