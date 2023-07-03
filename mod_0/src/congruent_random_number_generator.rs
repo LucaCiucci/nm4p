@@ -62,7 +62,7 @@ pub fn congruent_random_number_generator_step(
 /// ```
 /// use codici_mod_0::congruent_random_number_generator::*;
 ///
-/// let mut rng = Generator::default();
+/// let mut rng = CongruentGenerator::default();
 /// for _ in 0..10 {
 ///     println!("{}", rng.generate());
 /// }
