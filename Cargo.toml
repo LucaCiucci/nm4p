@@ -1,0 +1,9 @@
+[workspace]
+members = [
+    "utils",
+    "mod_0",
+]
+default-members = [
+    #"utils",
+    "mod_0",
+]

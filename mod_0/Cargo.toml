@@ -1,0 +1,8 @@
+[package]
+name = "codici_mod_0"
+version = "0.1.0"
+edition = "2021"
+authors = ["Luca Ciucci"]
+
+[dependencies]
+nm4p-utils = { path = "../utils" }
