@@ -1,3 +1,3 @@
 
-pub mod congruent_random_number_generator;
+pub mod congruent_generator;
 pub mod ran;

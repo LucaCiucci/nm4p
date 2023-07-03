@@ -1,4 +1,4 @@
-use crate::congruent_random_number_generator::{CongruentGenerator, Parameters, DEFAULT_SEED};
+use crate::congruent_generator::{CongruentGenerator, Parameters, DEFAULT_SEED};
 
 
 /// Create a new "`ran0`" generator.
