@@ -1,4 +1,4 @@
-use nm4p_utils::stat::var;
+use nm4p_common::stat::var;
 
 fn main() {
     println!("Hello, world!");

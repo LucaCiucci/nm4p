@@ -19,7 +19,7 @@ Example:
 ```sh
 # update Rust if needed with `rustup update`
 cd mod_0
-cargo run --example congruent_generator # add --release if too slow
+cargo run --example congruent_generator # add --release if too slow (usually ~10x faster)
 ```
 
 Some examples might need a minute or two to build because of external dependencies.

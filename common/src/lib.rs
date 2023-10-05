@@ -1,5 +1,8 @@
-use std::ops::Deref;
 
+pub use clap;
+
+
+use std::ops::Deref;
 
 pub mod stat;
 
@@ -19,3 +22,4 @@ impl<T> Deref for Immutable<T> {
         &self.value
     }
 }
+

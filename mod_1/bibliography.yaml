@@ -1,0 +1,16 @@
+
+metropolis-orig:
+  # TODO non sono sicuro che sia l'articolo giusto, mi pare che avevo
+  # preso questa referenza da wikipedia
+  # TODO leggi
+  type: Article
+  title: Equation of State Calculations by Fast Computing Machines
+  url: https://bayes.wustl.edu/Manual/EquationOfState.pdf
+
+metropolis-hastings:
+  # TODO leggi
+  type: Article
+  title: The Metropolis-Hastings algorithm
+  author: Christian P. Robert
+  url: https://arxiv.org/abs/1504.01896
+  #url: https://arxiv.org/pdf/1504.01896.pdf

@@ -1,5 +1,5 @@
 /*!
-From [`congruent_random_number_generator.f`](../fortran_src/congruent_random_number_generator.f) (M. D'Elia - 09/2018)
+From [`congruent_generator.f`](../fortran_src/congruent_generator.f) (M. D'Elia - 09/2018)
 
 NOTE: integer(16) in Fortran is i128 in Rust
 we require quite large integers for the generator.
@@ -29,16 +29,16 @@ pub const DEFAULT_SEED: i128 = 2;
 ///
 /// # Example
 /// ```
-/// use codici_mod_0::congruent_random_number_generator::*;
+/// use codici_mod_0::congruent_generator::*;
 ///
 /// let x_k = 2;
 /// let params = Parameters::default();
-/// let x_k_plus_1 = congruent_random_number_generator_step(x_k, &params);
+/// let x_k_plus_1 = congruent_generator_step(x_k, &params);
 ///
 /// assert_eq!(x_k_plus_1, 96542);
 /// ```
 #[must_use]
-pub fn congruent_random_number_generator_step(
+pub fn congruent_generator_step(
     x_k: i128,
     p: &Parameters,
 ) -> i128 {
@@ -49,7 +49,7 @@ pub fn congruent_random_number_generator_step(
 /// The Congruent Random Number Generator
 ///
 /// This generator is based on the congruent random number generator described in
-/// [`congruent_random_number_generator_step`]
+/// [`congruent_generator_step`]
 ///
 /// You can find an example usage in the `examples` folder.
 ///
@@ -60,7 +60,7 @@ pub fn congruent_random_number_generator_step(
 ///
 /// # Example
 /// ```
-/// use codici_mod_0::congruent_random_number_generator::*;
+/// use codici_mod_0::congruent_generator::*;
 ///
 /// let mut rng = CongruentGenerator::default();
 /// for _ in 0..10 {
@@ -70,7 +70,7 @@ pub fn congruent_random_number_generator_step(
 pub struct CongruentGenerator {
     /// current state
     ///
-    /// This is the `x_k` in [`congruent_random_number_generator_step`]
+    /// This is the `x_k` in [`congruent_generator_step`]
     x: i128,
 
     /// parameters of the generator
@@ -104,13 +104,13 @@ impl CongruentGenerator {
 
     /// Generate a random number in `[0,1)`
     pub fn generate(&mut self) -> f64 {
-        self.x = congruent_random_number_generator_step(self.x, &self.params);
+        self.x = congruent_generator_step(self.x, &self.params);
 
         // the actual random number in [0,1)
         self.x as f64 / self.params.m as f64
     }
 
-    /// Get the current state of the generator (`x_k` of [`congruent_random_number_generator_step`])
+    /// Get the current state of the generator (`x_k` of [`congruent_generator_step`])
     pub fn current_state(&self) -> i128 {
         self.x
     }
@@ -163,7 +163,7 @@ impl Parameters {
     ///
     /// # Example
     /// ```
-    /// use codici_mod_0::congruent_random_number_generator::*;
+    /// use codici_mod_0::congruent_generator::*;
     /// assert_eq!(Parameters::LEHMER.name(), Some("Lehmer"));
     /// assert_eq!(Parameters{m: 1, a: 2, c: 3}.name(), None);
     /// ```

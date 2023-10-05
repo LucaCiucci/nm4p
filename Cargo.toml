@@ -1,9 +1,13 @@
 [workspace]
+#resolver = "2"
 members = [
-    "utils",
+    "common",
     "mod_0",
+    "mod_1",
+    "prova_elimina"
 ]
 default-members = [
-    #"utils",
+    "common",
     "mod_0",
+    "mod_1",
 ]

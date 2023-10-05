@@ -1,9 +1,0 @@
-[book]
-authors = ["Luca Ciucci"]
-language = "en"
-multilingual = false
-src = "src"
-title = "nm4p - Luca Ciucci"
-
-[output.html]
-#mathjax-support = true # \\( \int x dx = \frac{x^2}{2} + C \\)

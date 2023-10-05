@@ -1,7 +1,13 @@
 {
     "cSpell.words": [
         "idum",
+        "infty",
+        "Ising",
+        "MCMC",
         "powi",
-        "rnmx"
+        "Reweighting",
+        "rngs",
+        "rnmx",
+        "Seedable"
     ]
 }
