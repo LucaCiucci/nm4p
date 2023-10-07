@@ -4,11 +4,15 @@
 #import "common/project.typ": *
 
 #let code_ref(file, line: 0) = {
-    let base = "https://github.com/LucaCiucci/nm4p/tree/rust/";
+    let url = "https://github.com/LucaCiucci/nm4p/tree/rust/" + file;
     let content = if line <= 0 {
         file
     } else {
+        url = url + "#L" + str(line);
         file + ":" + str(line)
     };
-    link(base + file, raw(content, block: false))
+    link(url, raw(content, block: false))
+    footnote(link(url, url))
 }
+
+#let appendix(title) = heading(title, supplement: "Appendix")

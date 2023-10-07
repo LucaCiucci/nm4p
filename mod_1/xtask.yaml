@@ -1,0 +1,11 @@
+primo_test_metrogauss: cargo run --example metropolis-gauss -- 1000 --seed 42 --mu 10 --sigma 1 --x0 0 --delta 1 --plot mod_1/img/plots/primo_test_metrogauss
+primo_test_metrogauss-skip: cargo run --example metropolis-gauss -- 1000 --seed 42 --mu 10 --sigma 1 --x0 0 --delta 1 --plot mod_1/img/plots/primo_test_metrogauss-skip --skip 1000000
+metrogauss-low-delta: cargo run --example metropolis-gauss -- 100 --seed 42 --mu 10 --sigma 1 --x0 0 --delta 0.1 --plot mod_1/img/plots/metrogauss-low-delta --skip 1000000 --print-stats
+metrogauss-high-delta: cargo run --example metropolis-gauss -- 100 --seed 42 --mu 10 --sigma 1 --x0 0 --delta 50 --plot mod_1/img/plots/metrogauss-high-delta --skip 1000000 --print-stats
+
+metrogauss-acceptance: cargo run --example metropolis-gauss-acc-plot --release
+
+autocorr_plain: cargo run --example autocorr-plain --release -- 10000000 200 mod_1/img/plots/autocorr_plain
+autocorr_plain-log: cargo run --example autocorr-plain --release -- 10000000 200 mod_1/img/plots/autocorr_plain-log --y-log
+autocorr_plain-full: cargo run --example autocorr-plain --release -- 1000 1000 mod_1/img/plots/autocorr_plain-full
+autocorr_fft-full: cargo run --example autocorr-fft -- 1000 1000 mod_1/img/plots/autocorr_fft-full

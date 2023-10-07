@@ -81,6 +81,9 @@ fn main() {
         let (mean, var) = mean_var(samples.iter().map(|(x, _)| *x));
         println!("Mean: {} vs {}", mean, args.mu);
         println!("Var: {} vs {}, sigma: {} vs {}", var, args.sigma.powi(2), var.sqrt(), args.sigma);
+        let n_acc = samples.iter().filter(|(_, accepted)| *accepted).count();
+        let n = samples.len();
+        println!("acceptance: {}/{}, {}={}%", n_acc, n, n_acc as f64 / n as f64, n_acc as f64 / n as f64 * 100.0);
         let n_iter = (args.n + args.skip) * args.stride;
         println!("{:?}/it, {:.0} it/s", elapsed / n_iter as u32, n_iter as f64 / elapsed.as_micros() as f64 * 1e6);
     }

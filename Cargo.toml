@@ -4,7 +4,8 @@ members = [
     "common",
     "mod_0",
     "mod_1",
-    "prova_elimina"
+    "prova_elimina",
+    "xtask",
 ]
 default-members = [
     "common",

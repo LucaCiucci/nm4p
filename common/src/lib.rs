@@ -1,5 +1,7 @@
 
 pub use clap;
+pub use indicatif;
+pub use rustfft;
 
 
 use std::ops::Deref;
@@ -23,3 +25,9 @@ impl<T> Deref for Immutable<T> {
     }
 }
 
+pub fn lerp<T>(a: T, b: T, t: f64) -> T
+where
+    T: std::ops::Add<Output = T> + std::ops::Sub<Output = T> + std::ops::Mul<f64, Output = T> + Copy,
+{
+    a + (b - a) * t
+}

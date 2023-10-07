@@ -14,3 +14,24 @@ metropolis-hastings:
   author: Christian P. Robert
   url: https://arxiv.org/abs/1504.01896
   #url: https://arxiv.org/pdf/1504.01896.pdf
+
+autocorr_fft_wikipedia:
+  type: Webpage
+  title: Autocorrelation - Efficient computation
+  url: https://en.wikipedia.org/wiki/Autocorrelation#Efficient_computation
+
+Understanding-Molecular-Simulation-autocorr-cap-4-4-2:
+  type: Book
+  title: "Understanding Molecular Simulation: From Algorithms to Applications, chapter 4.4.2, page 90"
+  url: https://www.eng.uc.edu/~beaucag/Classes/AdvancedMaterialsThermodynamics/Books/%5BComputational%20science%20(San%20Diego,%20Calif.)%5D%20Daan%20Frenkel_%20Berend%20Smit%20-%20Understanding%20molecular%20simulation%20_%20from%20algorithms%20to%20applications%20(2002,%20Academic%20Press%20)%20-%20libgen.lc.pdf#page=110
+
+book-back-matter-fourier-analysis:
+  type: Book
+  title: "BookBackMatter - Fourier Analysis"
+  url: https://cds.cern.ch/record/1338958/files/978-3-540-28215-0_BookBackMatter.pdf
+
+
+rustfft:
+  type: Webpage
+  title: RustFFT
+  url: https://docs.rs/rustfft/6.1.0/rustfft/
