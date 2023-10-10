@@ -23,5 +23,10 @@
   set heading(numbering: "1.")
   set math.equation(numbering: "(1)")
 
+  show link: link => text(link, rgb("#0000CD").darken(50%))
+  show ref: ref => text(ref, rgb("#0000CD").darken(50%))
+
+  //show image: image => []
+
   body
 }

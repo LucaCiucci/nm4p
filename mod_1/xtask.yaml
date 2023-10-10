@@ -9,3 +9,16 @@ autocorr_plain: cargo run --example autocorr-plain --release -- 10000000 200 mod
 autocorr_plain-log: cargo run --example autocorr-plain --release -- 10000000 200 mod_1/img/plots/autocorr_plain-log --y-log
 autocorr_plain-full: cargo run --example autocorr-plain --release -- 1000 1000 mod_1/img/plots/autocorr_plain-full
 autocorr_fft-full: cargo run --example autocorr-fft -- 1000 1000 mod_1/img/plots/autocorr_fft-full
+
+autocorr_fft-typical: cargo run --example autocorr-fft -- 10000 300 mod_1/img/plots/autocorr_fft-typical
+
+autocorr-int: cargo run --example autocorr-int -- 10000 200 mod_1/img/plots/autocorr-int
+autocorr-int-full: cargo run --example autocorr-int -- 1000 1000 mod_1/img/plots/autocorr-int-full
+autocorr-int-full-corrected: cargo run --example autocorr-int -- 1000 1000 mod_1/img/plots/autocorr-int-full-corrected --corrected
+
+autocorr-int-algo: cargo run --example autocorr-int-finder -- 10000 300 mod_1/img/plots/autocorr-int-algo
+autocorr-int-algo-deriv: cargo run --example autocorr-int-finder -- 10000 300 mod_1/img/plots/autocorr-int-algo-deriv --on-derivative
+
+autocorr-int-finder-tau_int-vs-iter: cargo run --example autocorr-int-finder-comparison --release
+
+metrogauss-tau_vs_acc: cargo run --example metropolis-gauss-tau-vs-acc --release

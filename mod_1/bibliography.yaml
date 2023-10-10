@@ -35,3 +35,45 @@ rustfft:
   type: Webpage
   title: RustFFT
   url: https://docs.rs/rustfft/6.1.0/rustfft/
+
+levenberg-marquardt:
+  type: Article
+  title: The Levenberg-Marquardt algorithm for nonlinear least squares curve-fitting problems
+  url: https://people.duke.edu/~hpgavin/ExperimentalSystems/lm.pdf
+
+autocorr-daniel:
+  type: Webpage
+  author: Daniel Foreman-Mackey
+  title: Autocorrelation time estimation
+  date: "2017-10-16"
+  #url: https://dfm.io/posts/autocorr/
+  url: https://emcee.readthedocs.io/en/stable/tutorials/autocorr/
+
+ensemble-sampler-section-5:
+  type: Article
+  title: Ensemble samplers with affine invariance - section 5
+  date: 2010
+  doi: http://dx.doi.org/10.2140/camcos.2010.5.65
+  #url: https://msp.org/camcos/2010/5-1/camcos-v5-n1-p04-s.pdf
+  url: https://msp.org/camcos/2010/5-1/p04.xhtml
+  author:
+    - Jonathan Goodman
+    - Jonathan Weare
+
+Berg-lecturenotes-7-MCMC-III-p7:
+  type: Webpage
+  title: Lecturenotes 7 MCMC III
+  author: Bernd Albert Berg
+  url: http://www.hep.fsu.edu/~berg/teach/mcmc08/material/lecture07mcmc3.pdf#page=7
+
+intro-MCMC-berg:
+  type: Book
+  title: Introduction to Markov Chain Monte Carlo Simulations and their Statistical Analysis
+  author: Bernd Albert Berg
+  url: https://arxiv.org/abs/cond-mat/0410490
+
+mcm-stat-mech-sokal:
+  type: Book
+  author: A. Sokal
+  date: 1996
+  url: https://www.semanticscholar.org/paper/Monte-Carlo-Methods-in-Statistical-Mechanics%3A-and-Sokal/0bfe9e3db30605fe2d4d26e1a288a5e2997e7225?p2df

@@ -13,6 +13,8 @@ Note that there might be cross dependencies between modules.
 
 ## Running the code
 
+> ⚠️ **Warning**: at the time of write, [`cargo-script`](https://rust-lang.github.io/rfcs/3424-cargo-script.html) is still unstable, it would work with nightly Rust but there is no rust-analyzer support for it. For this reason, all the script are just examples in the `examples` folder of each module.
+
 If you [installed Rust](https://www.rust-lang.org/tools/install), you can navigate to any module folder and run an example. In VSCode, you can also use the `Run` button above the main function of each example.
 
 Example:

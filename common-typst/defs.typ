@@ -15,4 +15,4 @@
     footnote(link(url, url))
 }
 
-#let appendix(title) = heading(title, supplement: "Appendix")
+#let appendix(title) = heading([Appendix: #title], supplement: "Appendix")
