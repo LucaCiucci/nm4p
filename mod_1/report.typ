@@ -117,9 +117,9 @@ Per valutare l'efficienza dell'algoritmo, è utile calcolare la percentuale di a
 #figure(
     stack(
         dir: ltr,
-        stack(image("img/plots/metrogauss-low-delta.svg", width: 40%), [(a)]),
-        stack(image("img/plots/metrogauss-high-delta.svg", width: 40%), [(b)]),
-    ) + stack(image("img/plots/primo_test_metrogauss-skip.svg", width: 40%), [(c)]),
+        stack(image("img/plots/metrogauss-low-delta.svg", width: 50%), [(a)]),
+        stack(image("img/plots/metrogauss-high-delta.svg", width: 50%), [(b)]),
+    ) + stack(image("img/plots/primo_test_metrogauss-skip.svg", width: 50%), [(c)]),
     caption: [
         Output dell'algoritmo per due diversi $delta$: $delta = 0.1$ in (a)#footnote(raw(xtasks.metrogauss-low-delta, block: false, lang: "sh")) e $delta = 50$ in (b)#footnote(raw(xtasks.metrogauss-high-delta, block: false, lang: "sh")). (c) è corrisponde agli stessi parametri di @primo_test_metrogauss-skip\
         In entrambi i casi si osserva che il tempo di correlazione diventa grande per tali parametri, mentre nel caso (c) in cui $delta = 1$ che è dello stesso ordine di grandezza della deviazione standard della distribuzione target, il tempo di correlazione è molto più basso.
@@ -132,8 +132,8 @@ La dipendenza dei tempi di correlazione di $delta$ verrà analizzata in @autocor
 #figure(
     stack(
         dir: ltr,
-        image("img/plots/metrogauss-acceptance.svg", width: 40%),
-        image("img/plots/metrogauss-acceptance-log.svg", width: 40%),
+        image("img/plots/metrogauss-acceptance.svg", width: 50%),
+        image("img/plots/metrogauss-acceptance-log.svg", width: 50%),
     ),
     caption: [
         Rate di accettazione in funzione di $delta$ in scala lineare (a) e logaritmica (b)
@@ -232,7 +232,7 @@ tau_"int" (M) = sum_(k = 1)^M (1 - k/N) c_k
 $
 
 #figure(
-    image("img/plots/autocorr-int.svg", width: 40%),
+    image("img/plots/autocorr-int.svg", width: 50%),
     caption: [
         Tempo di autocorrelazione integrato in funzione di $M$ #footnote(raw(xtasks.autocorr-int, block: false, lang: "sh")).
     ]
@@ -246,8 +246,8 @@ Come vediamo, il tempo di autocorrelazione integrato cresce linearmente con $M$ 
 #figure(
     stack(
         dir: ltr,
-        image("img/plots/autocorr-int-full.svg", width: 40%),
-        image("img/plots/autocorr-int-full-corrected.svg", width: 40%),
+        image("img/plots/autocorr-int-full.svg", width: 50%),
+        image("img/plots/autocorr-int-full-corrected.svg", width: 50%),
     ),
     caption: [
         Tempo di autocorrelazione integrato in funzione di $M$ per $M = 1..N$ tramite la definizione @tau-int-basic (a) #footnote(raw(xtasks.autocorr-int-full, block: false, lang: "sh")) e @tau-int-corrected (b) #footnote(raw(xtasks.autocorr-int-full-corrected, block: false, lang: "sh")).
@@ -287,8 +287,8 @@ Per cui ci aspettiamo che, quando l'andamento esponenziale più lento si avvicin
 #figure(
     stack(
         dir: ltr,
-        stack(image("img/plots/autocorr-int-algo.svg", width: 40%), [(a)]),
-        stack(image("img/plots/autocorr-int-algo-int.svg", width: 40%), [(b)]),
+        stack(image("img/plots/autocorr-int-algo.svg", width: 50%), [(a)]),
+        stack(image("img/plots/autocorr-int-algo-int.svg", width: 50%), [(b)]),
     ),
     caption: [
         Esempio dell'output dell'algoritmo @alg-estimate-M applicato ad una serie di autocorrelazioni proveniente dall'algoritmo di metropolis su distribuzione gaussiana #footnote(raw(xtasks.autocorr-int-algo, block: false, lang: "sh")). La linea rossa rappresenta $M$. In (a) sono riportati i $c_k$ mentre in (b) i corrispondenti $tau_"int" (M)$.
@@ -323,8 +323,8 @@ Possiamo poi pensare di rendere l'algoritmo più robusto agendo sulla derivata d
 #figure(
     stack(
         dir: ltr,
-        stack(image("img/plots/autocorr-int-algo-deriv.svg", width: 40%), [(a)]),
-        stack(image("img/plots/autocorr-int-algo-deriv-int.svg", width: 40%), [(b)]),
+        stack(image("img/plots/autocorr-int-algo-deriv.svg", width: 50%), [(a)]),
+        stack(image("img/plots/autocorr-int-algo-deriv-int.svg", width: 50%), [(b)]),
     ),
     caption: [
         Esempio dell'output dell'algoritmo @alg-estimate-M-deriv applicato come in @autocorr-int-algo-out #footnote(raw(xtasks.autocorr-int-algo-deriv, block: false, lang: "sh")). La linea rossa rappresenta $M$. In (a) sono riportati i $c_k$ mentre in (b) i corrispondenti $tau_"int" (M)$.
@@ -342,13 +342,39 @@ Per verificarlo, proviamo a vedere gli andamenti di $tau_"int" (M)$ per entrambi
 ]
 
 #figure(
-    image("img/plots/autocorr-int-finder-tau_int-vs-iter.svg", width: 40%),
+    image("img/plots/autocorr-int-finder-tau_int-vs-iter.svg", width: 50%),
     caption: [
         Andamento dei tempi di autocorrelazione integrati in funzione di $N$ per entrambi gli algoritmi #footnote(raw(xtasks.autocorr-int-finder-tau_int-vs-iter, block: false, lang: "sh")). In nero è riportato il risultato e la varianza con $M$ calcolato con@alg-estimate-M mentre in rosso @alg-estimate-M-deriv.
     ]
 ) <autocorr-int-finder-tau_int-vs-iter>
 
-Da @autocorr-int-finder-tau_int-vs-iter osserviamo che entrambi gli algoritmi sembrano tendere ad uno stesso valore, che è quello che ci aspettiamo. Inoltre, @alg-estimate-M-deriv, pur avendo una varianza minore, converge più lentamente, sia per $N$ intermedi che per $N$ grandi, per questo motivo in tutte le analisi successive ho usato @alg-estimate-M per cui è richiesto un $N$ minore prima di essere "ragionevolmente"!!!!! alla convergenza.
+Da @autocorr-int-finder-tau_int-vs-iter osserviamo che entrambi gli algoritmi sembrano tendere ad uno stesso valore, che è quello che ci aspettiamo. Inoltre, @alg-estimate-M-deriv, pur avendo una varianza minore, converge più lentamente, sia per $N$ intermedi che per $N$ grandi, per questo motivo in tutte le analisi successive sarei tentato di usare @alg-estimate-M per cui è richiesto un $N$ minore prima di essere "ragionevolmente"!!!!! alla convergenza.
+
+C'è però un altro metodo semplice e più corretto per stimare $M$: la somma di due $c_k$ consecutivi è sempre positiva (vedi @betanalpha-mcmc-in-practice), per cui, possiamo stimare $M$ come il primo $m$ tale che $c_m + c_(m + 1) < 0$.
+#algorithm(
+    title: [Stima di $M$ tramite derivata somma di due $c_k$ successive],
+    label: "alg-estimate-M-sum",
+)[
+    + Calcola le ${c_k}$
+    + trova il primo $m$ tale che $c_m + c_(m + 1) < 0$
+    + $M = m$
+]
+Questo metodo sembra essere più rigoroso e meno sensibile al rumore rispetto a @alg-estimate-M. Nella pratica, per la distribuzione considerata, i risultati sono comparabili a @alg-estimate-M. Ho quindi deciso di utilizzare @alg-estimate-M-sum per stimare $M$.
+
+#note[
+    @alg-estimate-M-sum è meglio di @alg-estimate-M perché quando c'è una correlazione molto negativa, @alg-estimate-M non funziona perché lo zero viene subito raggiunto, mentre @alg-estimate-M-sum funziona perché la somma di due $c_k$ consecutive è sempre positiva.
+    ```bob-50
+      ^"c_k"               ^ c_k + c_(k + 1)
+     1|─╮                  |─╮
+      | │╭╮                | ╰─╮
+      | │||╭╮              |   ╰─╮
+      | │||||╭╮     ∑      |     ╰─
+    --+-+++++++->   ->   --+--------->
+      | │|||╰╯             |
+      | │|╰╯               |
+      | ╰╯                 |
+    ```
+]
 
 Notiamo inoltre, dai grafici precedenti @autocorr-int-algo-out e @autocorr-int-algo-out-deriv, che gli algoritmi fanno pressappoco ciò che faremmo "ad occhio", quindi userò @alg-estimate-tau-int associato ad @alg-estimate-M per stimare $tau_"int"$ anziché farlo manualmente onde evitare errori umani.
 Per quanto riguarda la non correttezza della stima per $N$ non sufficientemente grandi, notiamo che si avrebbe lo stesso problema con una selezione manuale di $M$: manualmente prenderemmo un $M$ tale che il grafico di $tau_"int"(M)$ si "appiattisca", ma questo è esattamente quello che sta facendo l'algoritmo e dunque la problematica è esattamente la stessa.
@@ -363,7 +389,7 @@ Ho dunque deciso di proseguire utilizzando tale algoritmo per la stima di $tau_"
 
 Con gli strumenti appena descritti, possiamo stimare il tempo di autocorrelazione integrato per l'algoritmo di metropolis applicato alla distribuzione gaussiana vs accettazione. Un esempio di tale stima è riportato in @metrogauss-tau_vs_acc.
 #figure(
-    image("img/plots/metrogauss-tau_vs_acc.svg", width: 40%),
+    image("img/plots/metrogauss-tau_vs_acc.svg", width: 50%),
     caption: [
         Tempo di autocorrelazione integrato in funzione del rate di accettazione per l'algoritmo di metropolis applicato alla distribuzione gaussiana #footnote(raw(xtasks.metrogauss-tau_vs_acc, block: false, lang: "sh")).
     ]
@@ -396,20 +422,161 @@ E abbiamo che (@intro-MCMC-berg #sym.section 10.2) per $k >> tau_"int"$:
 ]
 Dunque possiamo stimare (@intro-MCMC-berg):
 $
-1 + 2 tau_"int" = lim_(k -> infinity) ("var"(x_i^k) / "var"(x_i))
-$
+1 + 2 tau_"int" = lim_(k -> infinity) ("var"(overline(x_i^k)) / "var"(overline(x_i)))
+$ <binning-tau-int>
 dove $"var"(x_i)$ è l'estimatore:
 $
 "var"(x_i) = 1 / (N - 1) sum_(j = 1)^(N) (x_j - overline(x))^2
-$
+$ <def-var-estimator>
 #todo[
-    questa va scritta prima e fai una reference al codice
+    @def-var-estimator va scritta prima e fai una reference al codice
 ]
 Cioè, inserendolo nella @var-of-mean-corrected, possiamo semplicemente stimare:
 $
 sigma_overline(x)^2 = lim_(k -> infinity) "var"(x_i^k) / k
 $
 Che è quello che ci interessava.
+
+In practice, we cannot compute this limit. If $N$ is the number of samples, the number of blocks will be $floor(N\/k)$ and this means that we can expect the associated statistical error to scale (for large $N$) as $tilde sqrt(k)$.\
+This means we cannot simply choose $k$ to be very large, as this would make the error too large having a very small number of blocks.\
+
+We can also see that each block has a correlation with the following one that (for large $N$ and $k$) scales as $tilde 1 \/ k$. This means $k$ should not be large, otherwise the bias will be important.
+#todo[
+    controlla $tilde 1 \/ k$
+]
+#todo[
+    ref to bias equation
+]
+
+To further investigate the scaling of the error, we generate a dataset with a known exponential autocorrelation:
+$
+x_(i + 1) &= e^(-1\/tau) x_i + y_i sqrt(1 - e^(-2\/tau)) \
+&eq.def a x_i + b y_i
+$ <test-dataset-exp-correlation>
+with:
+$
+{ y_i } = "iid" tilde N(mu = 0, sigma = 1); x_0 tilde N(mu = 0, sigma = 1)
+$
+Da cui possiamo verificare che:
+$
+sigma_(x_i)^2 = 1\
+$
+e
+$
+"cov"(x_i, x_(i + k)) &= "cov"(x_i, a^k x_i + sum_(j = 0)^(k - 1) a^j b y_(i + j)) \
+&= "cov"(x_i, a^k x_i) \
+&= a^k "cov"(x_i, x_i) \
+&= e^(-k\/tau)
+$
+Quindi ci aspettiamo semplicemente:
+$
+c_k = e^(-k\/tau)
+$
+che, dalla @tau_int_of_tau_exp abbiamo:
+$
+tau_"int" &= e^(-k \/ tau) / (1 - e^(-k \/ tau))
+$
+
+//#image("img/plots/binning.svg")
+#figure(
+    image("img/plots/binning.svg", width: 50%),
+    caption: [
+        Tipical trend of $tau_"int"$ computed using @binning-tau-int for a dataset with exponential autocorrelation @test-dataset-exp-correlation.
+        The variance is estimated by repeating the binning process multiple times and computing the variance of the results. #footnote(raw(xtasks.binning, block: false, lang: "sh")).
+    ]
+) <binning-trend>
+
+As we can see from @binning-trend, this $tau_"int"$ estimator converges slowly to the true value. In particular, for large $k$ there is a bias that improves like $tilde 1 \/ k$ but the variance increases like $tilde sqrt(k)$ (see @efficient-autocorrelation-spectra). This makes the choice of a trade-off between bias and variance difficult.\
+
+To solve this problem, @efficient-autocorrelation-spectra suggests to estimate the correction factor. The bias correction for $tau_"int"$ for our definition results in:
+$
+tau'_"int" (2 k) eq.def 2 tau_"int" (2 k) - tau_"int" (k)
+$ <binning-tau-int-corrected>
+
+#figure(
+    image("img/plots/binning-comparison.svg", width: 50%),
+    caption: [
+        Comparison between @binning-tau-int (black) and @binning-tau-int-corrected (blue). We can see that the bias-corrected estimate converges nearly as fast as the explicit autocorrelation factor summation (red). The green line and band is the estimate and variance of the rough estimate @alg-estimate-tau-int. #footnote(raw(xtasks.binning-comparison, block: false, lang: "sh")).
+    ]
+) <binning-trend-comparison>
+
+As observed in @efficient-autocorrelation-spectra, the bias-corrected estimator @binning-tau-int-corrected converges nearly as fast as the explicit autocorrelation factor summation.\
+Following this conclusion, we might be tempted say that the explicit autocorrelation factor summation the best estimator for $tau_"int"$, but this is not a general result. In particular, MC methods might show strong negative autocorrelations (see @betanalpha-mcmc-in-practice) and this might presents a vulnerability for @alg-estimate-M-sum since fluctuations of the autocorrelation estimates might lead to highly underestimated cutoffs.
+
+I then decided to analyze the efficiency of the bias corrected estimator ()said $theta$.
+$
+theta = ??????? prop 
+$
+#todo[
+    continua
+]
+
+I thus decided to use the following approach:
++ use @alg-estimate-tau-int in combination with @alg-estimate-M-sum to estimate $tau_"int"$
++ use this estimate to pick $k tilde 10 tau_"int"$
++ use @binning-tau-int-corrected obtain a new to estimate for $tau_"int"$
++ use the new estimate to pick $k tilde 10 tau_"int"$
++ @binning-tau-int-corrected again to obtain the final estimate for ESS using @def-ESS
+Note that we do not iterate until convergence since there is no guarantee that the estimate will converge, it is likely that we would enter a loop of oscillations.
+
+#todo[
+    move
+]
+$
+"ESS" eq.def N / (1 + 2 tau_"int")
+$ <def-ESS>
+$
+"correct var" (= "var"(overline(x_i^k)) / k) = "var"(overline(x_i)) / (1 + 2 tau_"int") = "ESS" / N "var"(overline(x_i))
+$
+$
+==> "ESS"/N = "correct var" / "var"(overline(x_i))
+$
+
+#let r = yaml("img/plots/test-tau-int-estimate.yaml")
+#format_with_err(r.estimated, r.uncertainty)
+
+#let c = {
+    import "@preview/cetz:0.1.2": canvas, draw, tree
+    let c = canvas(length: 1cm, {
+        import draw: *
+
+        set-style(content: (padding: .2))
+
+        let data = (
+            $x^((8))_0$,
+            ($x^((4))_0$, ($x^((2))_0$, $x^((1))_0$, $x^((1))_1$), ($x^((2))_1$, $x^((1))_2$, $x^((1))_3$)),
+            ($x^((4))_1$, ($x^((2))_2$, $x^((1))_4$, $x^((1))_5$), ($x^((2))_3$, $x^((1))_6$, $x^((1))_7$)),
+        );
+
+        let y = -3.5;
+        let x = -0.5;
+        line((-0.5, y), (8, y), mark: (end: ">"))
+        line((x, y), (x, 1), mark: (end: ">"))
+        content((8, y + 0.25), [index])
+        content((x + 0.25, 0.75), $k$)
+        tree.tree(
+            data,
+            spread: 1.0,
+            grow: 1.0,
+            stroke: gray + 2pt,
+            name: "tree",
+            draw-edge: (from, to, ..) => {
+                let (a, b) = (from + ".center",
+                to + ".center")
+                line((a: a, b: b, abs: true, number: .35),
+                (a: b, b: a, abs: true, number: .35), mark: (start: ">"))
+            }
+        );
+    });
+    c
+}
+
+#figure(
+    c,
+    caption: [
+        Logarithmic binning: bins are averaged 2-by-2 while doubling the $k$ from bottom to top, i.e. $x^((2k))_i = (x^((k))_(2i) + x^((k))_(2i + 1))\/2$
+    ]
+)
 
 #appendix[Andamento $1\/delta$] <andamento_1_delta>
 
@@ -621,8 +788,8 @@ Un esempio di output è riportato in @autocorr_plain.
 #figure(
     stack(
         dir: ltr,
-        image("img/plots/autocorr_plain.svg", width: 40%),
-        image("img/plots/autocorr_plain-log.svg", width: 40%),
+        image("img/plots/autocorr_plain.svg", width: 50%),
+        image("img/plots/autocorr_plain-log.svg", width: 50%),
     ),
     caption: [
         Esempio #footnote(raw(xtasks.autocorr_plain, block: false, lang: "sh")) di autocorrelazioni calcolate tramite @ck-plain in scala lineare (a) e logaritmica (b)
@@ -634,7 +801,7 @@ Notiamo che in @autocorr_plain, l'andamento per piccoli $k$ è simil-esponenzial
 Riducendo il dataset (in quanto l'algoritmo è $O(N^2)$), possiamo vedere l'andamento a grandi $k$ in @autocorr_plain-full.
 
 #figure(
-    image("img/plots/autocorr_plain-full.svg", width: 40%),
+    image("img/plots/autocorr_plain-full.svg", width: 50%),
     caption: [
         Esempio #footnote(raw(xtasks.autocorr_plain-full, block: false, lang: "sh")) di autocorrelazioni calcolate tramite @ck-plain in scala lineare
     ]
@@ -701,8 +868,8 @@ Possiamo notare in @confronto-ck-plain-fft che le autocorrelazioni fornite dai d
 #figure(
     stack(
         dir: ltr,
-        image("img/plots/autocorr_plain-full.svg", width: 40%),
-        image("img/plots/autocorr_fft-full.svg", width: 40%),
+        image("img/plots/autocorr_plain-full.svg", width: 50%),
+        image("img/plots/autocorr_fft-full.svg", width: 50%),
     ),
     caption: [
         Esempio di autocorrelazioni calcolate tramite @ck-plain (a) e @ck-fft-1d (b) #footnote(raw(xtasks.autocorr_fft-full, block: false, lang: "sh")) in scala lineare. Le differenza massima tra i due metodi è di $1.4 dot 10^(-13)$.
@@ -875,6 +1042,33 @@ void autocorrFFT3(const double* data, double* out_corr, size_t count, double mea
 #todo[
     Forse potrebbe essere interessante fare un confronto tra le due definizioni delle autocorrelazioni, ma solo alla fine se mi rimane tempo.
 ]
+
+#appendix[$tau_"int"$ vs $tau_"exp"$]
+
+La definizione di $tau_"int"$ data in @tau-int-basic è stata scelta in modo tale che, nel caso di autocorrelazioni esponenziale, per grandi tempi di autocorrelazione si ha $tau_"int" approx tau_"exp"$. In tal modo, stimando $tau_"int"$ possiamo avere un'idea intuitiva dei tempi caratteristici del tempo di autocorrelazione caratteristico del sistema.\
+
+E' importante notare che, anche nel caso di autocorrelazioni esponenziali, $tau_"int"$ non è il tempo di autocorrelazione, ma è un valore generalmente simile.\
+Infatti, secondo @tau-int-basic abbiamo che:
+$
+tau_"int" &= sum_(k = 1)^N c_k = sum_(k = 1)^N e^(-k \/ tau_"exp")\
+&approx sum_(k = 1)^N e^(-k \/ tau_"exp") = e^(-k \/ tau_"exp") / (1 - e^(-k \/ tau_"exp"))
+$ <tau_int_of_tau_exp>
+dunque, la correzione è:
+$
+tau_"int" / tau_"exp" = e^(-k \/ tau_"exp") / (tau_"exp" (1 - e^(-k \/ tau_"exp")))
+$ <tau_int_over_tau_exp>
+Per cui, ad esempio si ha:
+#let tau_exp = 100
+#let rounding = 1000
+$
+cases(
+    tau_"exp" = #tau_exp,
+    tau_"int" approx.eq #(calc.round(calc.exp(-1 / tau_exp) / (1 - calc.exp(-1 / tau_exp)) * rounding) / rounding),
+    tau_"int" \/ tau_"exp" approx.eq #(calc.round(calc.exp(-1 / tau_exp) / (1 - calc.exp(-1 / tau_exp)) * rounding * 10 / tau_exp) / (rounding * 10)),
+)
+$
+
+#warning[$ tau_"int" eq.not tau_"exp" $]
 
 = Codebase
 

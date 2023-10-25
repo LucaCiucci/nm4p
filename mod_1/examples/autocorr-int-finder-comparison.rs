@@ -1,6 +1,6 @@
 
 use mod_1::metropolis_1d::{MH1D, kernels::UniformKernel};
-use nm4p_common::{stat::{estimate_rough_tau_int_impl, mean_var}, indicatif::{self, ProgressStyle}, lerp};
+use nm4p_common::{stat::{estimate_rough_tau_int_impl, mean_var, RoughTauIntEstimationMethod::*}, indicatif::{self, ProgressStyle}, lerp};
 use rand::SeedableRng;
 
 fn main() {
@@ -44,8 +44,7 @@ fn main() {
 
             estimate_rough_tau_int_impl(
                 &samples,
-                false,
-                10,
+                Normal,
             ).map(|(_m, tau_int)| tau_int)
         }));
 
@@ -68,8 +67,7 @@ fn main() {
 
             estimate_rough_tau_int_impl(
                 &samples,
-                true,
-                10,
+                Derivative,
             ).map(|(_m, tau_int)| tau_int)
         }));
 

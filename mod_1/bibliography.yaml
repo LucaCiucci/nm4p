@@ -77,3 +77,17 @@ mcm-stat-mech-sokal:
   author: A. Sokal
   date: 1996
   url: https://www.semanticscholar.org/paper/Monte-Carlo-Methods-in-Statistical-Mechanics%3A-and-Sokal/0bfe9e3db30605fe2d4d26e1a288a5e2997e7225?p2df
+
+efficient-autocorrelation-spectra:
+  type: Article
+  title: "Efficient estimation of autocorrelation spectra"
+  date: 2018
+  author: Markus Wallerberger
+  url: https://arxiv.org/abs/1810.05079
+
+betanalpha-mcmc-in-practice:
+  type: Webpage
+  title: Markov Chain Monte Carlo in Practice
+  author: Michael Betancourt
+  date: 2020/05
+  url: https://betanalpha.github.io/assets/case_studies/markov_chain_monte_carlo.html

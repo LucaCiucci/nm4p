@@ -2,6 +2,9 @@
 pub use clap;
 pub use indicatif;
 pub use rustfft;
+pub use rand_distr;
+pub use rand;
+pub use yaml_rust;
 
 
 use std::ops::Deref;

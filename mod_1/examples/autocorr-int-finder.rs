@@ -1,6 +1,6 @@
 
 use mod_1::metropolis_1d::{MH1D, kernels::UniformKernel};
-use nm4p_common::{stat::{autocorr_int, autocorr_fft, estimate_rough_tau_int_impl}, clap};
+use nm4p_common::{stat::{autocorr_int, autocorr_fft, estimate_rough_tau_int_impl, RoughTauIntEstimationMethod::*}, clap};
 use rand::SeedableRng;
 
 use clap::Parser;
@@ -53,8 +53,7 @@ fn main() {
     #[allow(non_snake_case)]
     let (M, tau_int) = estimate_rough_tau_int_impl(
         &samples,
-        args.on_derivative,
-        10,
+        if args.on_derivative { Derivative } else { Normal },
     ).unwrap();
     println!("M: {}, tau_int = {}", M, tau_int);
 

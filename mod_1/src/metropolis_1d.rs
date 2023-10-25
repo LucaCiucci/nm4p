@@ -1,3 +1,4 @@
+use nm4p_common::rand;
 use rand::{Rng, RngCore};
 
 // Metropolis Hastings algorithm for 1D distributions

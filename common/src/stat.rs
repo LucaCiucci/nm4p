@@ -1,4 +1,6 @@
 
+use std::borrow::Borrow;
+
 use num_traits::{Float, FromPrimitive};
 
 /// Computes the mean and variance of the iterator.
@@ -21,7 +23,8 @@ where
     let e_x2 = sum_x2 / count;
     let e_x = sum_x / count;
 
-    (e_x, e_x2 - e_x.powi(2)) // TODO this is wrong! this is biased. Must use Bessel's correction
+    (e_x, (e_x2 - e_x.powi(2)) * count / (count - T::from_usize(1).unwrap())) // TODO this is wrong! this is biased. Must use Bessel's correction
+    //(e_x, e_x2 - e_x.powi(2)) // TODO this is wrong! this is biased. Must use Bessel's correction
 }
 
 /// Computes the variance of the iterator.
@@ -103,6 +106,7 @@ pub fn autocorr_int_inner<'a>(
 
     c
         .into_iter()
+        .skip(1)
         .enumerate()
         .map({
             let mut sum = 0.0;
@@ -123,72 +127,217 @@ pub fn autocorr_int(
     )
 }
 
-#[derive(Debug, Clone, Copy)]
-pub enum EstimateRoughTauIntMethod {
-    AutocorrCrossesZero,
-    AutocorrDerivativeCrossesZero,
-}
-
-#[derive(Debug, Clone, Copy)]
-pub struct EstimateRoughTauIntOptions {
-    pub method: EstimateRoughTauIntMethod,
-    pub min_multiplier: usize,
-}
-
-impl Default for EstimateRoughTauIntOptions {
-    fn default() -> Self {
-        Self {
-            method: EstimateRoughTauIntMethod::AutocorrDerivativeCrossesZero,
-            min_multiplier: 10,
-        }
-    }
+pub enum RoughTauIntEstimationMethod {
+    Normal,
+    Derivative,
+    SumSubsequent,
 }
 
 pub fn estimate_rough_tau_int_impl(
     x: &[f64],
-    on_derivative: bool,
-    min_multiplier: usize,
+    method: RoughTauIntEstimationMethod,
 ) -> Option<(usize, f64)> {
-    #[allow(non_snake_case)]
-    let N = x.len();
+    //#[allow(non_snake_case)]
+    //let N = x.len();
 
     let autocorr = autocorr_fft(x);
-    let autocorr_int = autocorr_int_inner(autocorr.iter().cloned(), false).collect::<Vec<_>>();
+    let autocorr_int = autocorr_int_inner(autocorr.iter().cloned(), false).collect::<Vec<_>>(); // TODO maybe false???
 
     #[allow(non_snake_case)]
-    let M = if on_derivative {
-        autocorr
+    let M = match method {
+        RoughTauIntEstimationMethod::Normal => autocorr
+        .iter()
+        .cloned()
+        .enumerate()
+        .find(|(_, c)| *c < 0.0)?.0,
+        RoughTauIntEstimationMethod::Derivative => autocorr
+        .iter()
+        .cloned()
+        .zip(autocorr.iter().cloned().skip(1))
+        .enumerate()
+        .find(|(_, (c_1, c_2))| *c_2 > *c_1)?.0,
+        RoughTauIntEstimationMethod::SumSubsequent => autocorr
             .iter()
             .cloned()
             .zip(autocorr.iter().cloned().skip(1))
             .enumerate()
-            .find(|(_, (c_1, c_2))| *c_2 > *c_1)?.0
-    } else {
-        autocorr
-            .iter()
-            .cloned()
-            .enumerate()
-            .find(|(_, c)| *c < 0.0)?.0
+            .find(|(_, (c_1, c_2))| (*c_1 + *c_2) < 0.0)?.0,
     };
 
-    if M * min_multiplier < N {
-        Some((M, autocorr_int[M]))
-    } else {
-        None
-    }
+    Some((M, autocorr_int[M]))
 }
 
 pub fn estimate_rough_tau_int(
     x: &[f64],
 ) -> Option<f64> {
-    let (_m, tau_int) = estimate_rough_tau_int_impl(
+    estimate_rough_tau_int_impl(
         x,
-        false,
-        1,
-    )?;
-    if tau_int as usize <= x.len() / 100 {
-        Some(tau_int)
-    } else {
-        None
+        RoughTauIntEstimationMethod::SumSubsequent,
+    ).map(|(_m, tau_int)| tau_int)
+}
+
+pub fn binning<'a>(
+    x: &'a [f64],
+    k: usize,
+) -> (usize, impl Iterator<Item = f64> + 'a) {
+    let n = x.len();
+    let n_out = n / k;
+
+    let bins = (0..n_out).map(move |i| {
+        let i = i * k;
+        let j = i + k;
+
+        x[i..j].iter().sum::<f64>() / k as f64
+    });
+
+    (n_out, bins)
+}
+
+#[derive(Debug, Clone)]
+pub struct LogBinningVarResultBin {
+    pub k: usize,
+    pub var: f64,
+    pub count: usize,
+}
+
+#[derive(Debug, Clone)]
+pub struct LogBinningVarResult {
+    pub count: usize,
+    pub mean: f64,
+    pub var: f64,
+    pub binning: Vec<LogBinningVarResultBin>,
+}
+
+pub fn logarithmic_binning_variance<I>(
+    x: I,
+) -> LogBinningVarResult
+where
+    I: IntoIterator,
+    I::Item: Borrow<f64>,
+{
+    struct Bin {
+        k: usize,
+        x2_sum: f64,
+        count: usize,
+        x_tail: Option<f64>,
     }
+    impl Bin {
+        fn new(k: usize) -> Self {
+            Self {
+                k,
+                x2_sum: 0.0,
+                count: 0,
+                x_tail: None,
+            }
+        }
+    }
+
+    let mut bins = Vec::<Bin>::new();
+
+    fn get_bin_at(bins: &mut Vec<Bin>, index: usize, k: usize) -> &mut Bin {
+        assert!(index <= bins.len());
+        if index == bins.len() {
+            // note: this push could, in theory make the algorithm be O(N (log N)^2) but, in practice, the number of bins is small enough that this is not a problem. Swapping the Vec for a LinkedList would make this O(N log N) but would be probably slower in practice
+            bins.push(Bin::new(k));
+        }
+        &mut bins[index]
+    }
+
+    fn push(x: f64, bins: &mut Vec<Bin>, at: usize, k: usize) {
+        let bin = get_bin_at(bins, at, k);
+        bin.x2_sum += x.powi(2);
+        bin.count += 1;
+        if let Some(x_tail) = bin.x_tail.take() {
+            push((x_tail + x) / 2.0, bins, at + 1, k * 2);
+        } else {
+            bin.x_tail = Some(x);
+        }
+    }
+
+    let mut sum_x = 0.0;
+    let mut sum_x2 = 0.0;
+    let mut count = 0;
+    for x in x {
+        let x = x.borrow();
+        push(*x, &mut bins, 0, 1);
+        sum_x += x;
+        sum_x2 += x.powi(2);
+        count += 1;
+    }
+
+    let mean_x = sum_x / count as f64;
+    let squared_mean_x = mean_x.powi(2);
+    let var_x = (sum_x2 / count as f64 - squared_mean_x) * count as f64 / (count as f64 - 1.0);
+
+    let binning = bins
+        .into_iter()
+        .map(|bin| {
+            let var = (bin.x2_sum / bin.count as f64 - squared_mean_x) * bin.count as f64 / (bin.count as f64 - 1.0);
+            LogBinningVarResultBin {
+                k: bin.k,
+                var,
+                count: bin.count,
+            }
+        })
+        .collect();
+
+    LogBinningVarResult {
+        count,
+        mean: mean_x,
+        var: var_x,
+        binning,
+    }
+}
+
+pub fn estimate_tau_int(
+    x: &[f64],
+) -> Option<f64> {
+    const FACTOR: f64 = 10.0; // TODO !!!
+
+    let log_binning = logarithmic_binning_variance(x);
+
+    let var_mu_sample = log_binning.var / log_binning.count as f64;
+
+    let esss_over_n = log_binning.binning
+        .iter()
+        .map(|level| {
+            let var_mu_level = level.var / level.count as f64;
+            let ess_over_n = var_mu_level / var_mu_sample;
+            ess_over_n
+        });
+
+    // the corresponding k is 2^(index + 1)
+    let esss_over_n_bc = esss_over_n
+        .clone()
+        .zip(esss_over_n.skip(1))
+        .map(|(ess_over_n_1, ess_over_n_2)| {
+            ess_over_n_2 * 2.0 - ess_over_n_1
+        })
+        .collect::<Vec<_>>();
+
+    let ess_for_approx_tau_int = move |tau_int: f64| -> f64 {
+        let desidered_k = tau_int * FACTOR;
+        // k = 2^(index + 1)
+        // index = log2(k) - 1
+        let desidered_index = desidered_k.log2() - 1.0;
+        let index = (desidered_index + 0.5) as usize;
+        esss_over_n_bc[index]
+    };
+
+    let rough_tau_int = estimate_rough_tau_int(x)?;
+    //println!("t1: {}", rough_tau_int);
+    let tau_int = tau_int_from_ess_over_n(ess_for_approx_tau_int(rough_tau_int));
+    //println!("t2: {}", tau_int);
+    let tau_int = tau_int_from_ess_over_n(ess_for_approx_tau_int(tau_int));
+    //println!("t3: {}", tau_int);
+
+    Some(tau_int)
+}
+
+pub fn tau_int_from_ess_over_n(ess_over_n: f64) -> f64 {
+    (ess_over_n - 1.0) / 2.0
+}
+
+pub fn ess_over_n_from_tau_int(tau_int: f64) -> f64 {
+    tau_int * 2.0 + 1.0
 }
