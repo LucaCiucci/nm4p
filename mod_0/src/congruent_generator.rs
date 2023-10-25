@@ -38,10 +38,7 @@ pub const DEFAULT_SEED: i128 = 2;
 /// assert_eq!(x_k_plus_1, 96542);
 /// ```
 #[must_use]
-pub fn congruent_generator_step(
-    x_k: i128,
-    p: &Parameters,
-) -> i128 {
+pub fn congruent_generator_step(x_k: i128, p: &Parameters) -> i128 {
     // linear transformation + mod
     (x_k * p.a + p.c).rem_euclid(p.m)
 }
@@ -89,10 +86,7 @@ impl Default for CongruentGenerator {
 impl CongruentGenerator {
     /// Create a new generator with a given seed and parameters
     pub fn new(seed: i128, params: Parameters) -> Self {
-        Self {
-            x: seed,
-            params,
-        }
+        Self { x: seed, params }
     }
 
     /// Create a new generator with a given seed and default parameters

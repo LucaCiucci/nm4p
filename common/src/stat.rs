@@ -1,4 +1,3 @@
-
 use std::borrow::Borrow;
 
 use num_traits::{Float, FromPrimitive};
@@ -23,8 +22,11 @@ where
     let e_x2 = sum_x2 / count;
     let e_x = sum_x / count;
 
-    (e_x, (e_x2 - e_x.powi(2)) * count / (count - T::from_usize(1).unwrap())) // TODO this is wrong! this is biased. Must use Bessel's correction
-    //(e_x, e_x2 - e_x.powi(2)) // TODO this is wrong! this is biased. Must use Bessel's correction
+    (
+        e_x,
+        (e_x2 - e_x.powi(2)) * count / (count - T::from_usize(1).unwrap()),
+    ) // TODO this is wrong! this is biased. Must use Bessel's correction
+      //(e_x, e_x2 - e_x.powi(2)) // TODO this is wrong! this is biased. Must use Bessel's correction
 }
 
 /// Computes the variance of the iterator.
@@ -39,9 +41,7 @@ where
     mean_var(values).1
 }
 
-pub fn autocorr_plain<'a>(
-    x: &'a [f64],
-) -> impl Iterator<Item = f64> + 'a {
+pub fn autocorr_plain<'a>(x: &'a [f64]) -> impl Iterator<Item = f64> + 'a {
     #[allow(non_snake_case)]
     let N = x.len();
 
@@ -55,20 +55,20 @@ pub fn autocorr_plain<'a>(
 
         x.zip(x_k)
             .map(|(x_i, x_i_k)| (x_i - mu) * (x_i_k - mu))
-            .sum::<f64>() / (var * (N - k) as f64)
+            .sum::<f64>()
+            / (var * (N - k) as f64)
     })
 }
 
-pub fn autocorr_fft(
-    x: &[f64],
-) -> Vec<f64> {
+pub fn autocorr_fft(x: &[f64]) -> Vec<f64> {
     #[allow(non_snake_case)]
     let N = x.len();
     let padding = N;
 
     let mean = x.iter().sum::<f64>() / N as f64;
 
-    let mut xx = x.iter()
+    let mut xx = x
+        .iter()
         .map(|x| x - mean)
         .chain(std::iter::repeat(0.0).take(padding))
         .map(|x| rustfft::num_complex::Complex::new(x, 0.0))
@@ -104,27 +104,21 @@ pub fn autocorr_int_inner<'a>(
     #[allow(non_snake_case)]
     let N = c.clone().count();
 
-    c
-        .into_iter()
-        .skip(1)
-        .enumerate()
-        .map({
-            let mut sum = 0.0;
-            move |(k, x)| {
-                sum += x * if corrected { 1.0 - k as f64 / N as f64 } else { 1.0 };
-                sum
-            }
-        })
+    c.into_iter().skip(1).enumerate().map({
+        let mut sum = 0.0;
+        move |(k, x)| {
+            sum += x * if corrected {
+                1.0 - k as f64 / N as f64
+            } else {
+                1.0
+            };
+            sum
+        }
+    })
 }
 
-pub fn autocorr_int(
-    x: &[f64],
-    corrected: bool,
-) -> impl Iterator<Item = f64> {
-    autocorr_int_inner(
-        autocorr_fft(x).into_iter(),
-        corrected
-    )
+pub fn autocorr_int(x: &[f64], corrected: bool) -> impl Iterator<Item = f64> {
+    autocorr_int_inner(autocorr_fft(x).into_iter(), corrected)
 }
 
 pub enum RoughTauIntEstimationMethod {
@@ -145,41 +139,43 @@ pub fn estimate_rough_tau_int_impl(
 
     #[allow(non_snake_case)]
     let M = match method {
-        RoughTauIntEstimationMethod::Normal => autocorr
-        .iter()
-        .cloned()
-        .enumerate()
-        .find(|(_, c)| *c < 0.0)?.0,
-        RoughTauIntEstimationMethod::Derivative => autocorr
-        .iter()
-        .cloned()
-        .zip(autocorr.iter().cloned().skip(1))
-        .enumerate()
-        .find(|(_, (c_1, c_2))| *c_2 > *c_1)?.0,
-        RoughTauIntEstimationMethod::SumSubsequent => autocorr
-            .iter()
-            .cloned()
-            .zip(autocorr.iter().cloned().skip(1))
-            .enumerate()
-            .find(|(_, (c_1, c_2))| (*c_1 + *c_2) < 0.0)?.0,
+        RoughTauIntEstimationMethod::Normal => {
+            autocorr
+                .iter()
+                .cloned()
+                .enumerate()
+                .find(|(_, c)| *c < 0.0)?
+                .0
+        }
+        RoughTauIntEstimationMethod::Derivative => {
+            autocorr
+                .iter()
+                .cloned()
+                .zip(autocorr.iter().cloned().skip(1))
+                .enumerate()
+                .find(|(_, (c_1, c_2))| *c_2 > *c_1)?
+                .0
+        }
+        RoughTauIntEstimationMethod::SumSubsequent => {
+            autocorr
+                .iter()
+                .cloned()
+                .zip(autocorr.iter().cloned().skip(1))
+                .enumerate()
+                .find(|(_, (c_1, c_2))| (*c_1 + *c_2) < 0.0)?
+                .0
+        }
     };
 
     Some((M, autocorr_int[M]))
 }
 
-pub fn estimate_rough_tau_int(
-    x: &[f64],
-) -> Option<f64> {
-    estimate_rough_tau_int_impl(
-        x,
-        RoughTauIntEstimationMethod::SumSubsequent,
-    ).map(|(_m, tau_int)| tau_int)
+pub fn estimate_rough_tau_int(x: &[f64]) -> Option<f64> {
+    estimate_rough_tau_int_impl(x, RoughTauIntEstimationMethod::SumSubsequent)
+        .map(|(_m, tau_int)| tau_int)
 }
 
-pub fn binning<'a>(
-    x: &'a [f64],
-    k: usize,
-) -> (usize, impl Iterator<Item = f64> + 'a) {
+pub fn binning<'a>(x: &'a [f64], k: usize) -> (usize, impl Iterator<Item = f64> + 'a) {
     let n = x.len();
     let n_out = n / k;
 
@@ -208,9 +204,7 @@ pub struct LogBinningVarResult {
     pub binning: Vec<LogBinningVarResultBin>,
 }
 
-pub fn logarithmic_binning_variance<I>(
-    x: I,
-) -> LogBinningVarResult
+pub fn logarithmic_binning_variance<I>(x: I) -> LogBinningVarResult
 where
     I: IntoIterator,
     I::Item: Borrow<f64>,
@@ -272,7 +266,8 @@ where
     let binning = bins
         .into_iter()
         .map(|bin| {
-            let var = (bin.x2_sum / bin.count as f64 - squared_mean_x) * bin.count as f64 / (bin.count as f64 - 1.0);
+            let var = (bin.x2_sum / bin.count as f64 - squared_mean_x) * bin.count as f64
+                / (bin.count as f64 - 1.0);
             LogBinningVarResultBin {
                 k: bin.k,
                 var,
@@ -289,30 +284,24 @@ where
     }
 }
 
-pub fn estimate_tau_int(
-    x: &[f64],
-) -> Option<f64> {
+pub fn estimate_tau_int(x: &[f64]) -> Option<f64> {
     const FACTOR: f64 = 10.0; // TODO !!!
 
     let log_binning = logarithmic_binning_variance(x);
 
     let var_mu_sample = log_binning.var / log_binning.count as f64;
 
-    let esss_over_n = log_binning.binning
-        .iter()
-        .map(|level| {
-            let var_mu_level = level.var / level.count as f64;
-            let ess_over_n = var_mu_level / var_mu_sample;
-            ess_over_n
-        });
+    let esss_over_n = log_binning.binning.iter().map(|level| {
+        let var_mu_level = level.var / level.count as f64;
+        let ess_over_n = var_mu_level / var_mu_sample;
+        ess_over_n
+    });
 
     // the corresponding k is 2^(index + 1)
     let esss_over_n_bc = esss_over_n
         .clone()
         .zip(esss_over_n.skip(1))
-        .map(|(ess_over_n_1, ess_over_n_2)| {
-            ess_over_n_2 * 2.0 - ess_over_n_1
-        })
+        .map(|(ess_over_n_1, ess_over_n_2)| ess_over_n_2 * 2.0 - ess_over_n_1)
         .collect::<Vec<_>>();
 
     let ess_for_approx_tau_int = move |tau_int: f64| -> f64 {

@@ -1,7 +1,6 @@
-
-use mod_1::metropolis_1d::{MH1D, kernels::UniformKernel};
-use nm4p_common::{clap, stat::mean_var, rand};
 use clap::Parser;
+use mod_1::metropolis_1d::{kernels::UniformKernel, MH1D};
+use nm4p_common::{clap, rand, stat::mean_var};
 use rand::SeedableRng;
 
 #[derive(Parser, Debug)]
@@ -57,7 +56,7 @@ fn main() {
     let mut rng = rand::rngs::StdRng::seed_from_u64(args.seed.unwrap_or(rand::random()));
 
     let metro = MH1D::new(
-        |x: f64| (-((x - args.mu)).powi(2) / (2.0 * args.sigma.powi(2))).exp(),
+        |x: f64| (-(x - args.mu).powi(2) / (2.0 * args.sigma.powi(2))).exp(),
         args.x0,
         UniformKernel::new(args.delta),
     );
@@ -80,12 +79,28 @@ fn main() {
     if args.print_stats {
         let (mean, var) = mean_var(samples.iter().map(|(x, _)| *x));
         println!("Mean: {} vs {}", mean, args.mu);
-        println!("Var: {} vs {}, sigma: {} vs {}", var, args.sigma.powi(2), var.sqrt(), args.sigma);
+        println!(
+            "Var: {} vs {}, sigma: {} vs {}",
+            var,
+            args.sigma.powi(2),
+            var.sqrt(),
+            args.sigma
+        );
         let n_acc = samples.iter().filter(|(_, accepted)| *accepted).count();
         let n = samples.len();
-        println!("acceptance: {}/{}, {}={}%", n_acc, n, n_acc as f64 / n as f64, n_acc as f64 / n as f64 * 100.0);
+        println!(
+            "acceptance: {}/{}, {}={}%",
+            n_acc,
+            n,
+            n_acc as f64 / n as f64,
+            n_acc as f64 / n as f64 * 100.0
+        );
         let n_iter = (args.n + args.skip) * args.stride;
-        println!("{:?}/it, {:.0} it/s", elapsed / n_iter as u32, n_iter as f64 / elapsed.as_micros() as f64 * 1e6);
+        println!(
+            "{:?}/it, {:.0} it/s",
+            elapsed / n_iter as u32,
+            n_iter as f64 / elapsed.as_micros() as f64 * 1e6
+        );
     }
 
     if let Some(_) = &args.plot {
@@ -125,7 +140,10 @@ fn plot(points: Vec<f64>, args: &Args) -> Result<(), Box<dyn std::error::Error>>
 
     chart.draw_series(
         //points.iter().enumerate().map(|(i, y)| Cross::new((i as f64, *y), 3, BLACK.filled())),
-        points.iter().enumerate().map(|(i, y)| Cross::new((i as f64, *y), 3, BLACK.filled())),
+        points
+            .iter()
+            .enumerate()
+            .map(|(i, y)| Cross::new((i as f64, *y), 3, BLACK.filled())),
     )?;
 
     root.present().expect("Unable to write result to file, please make sure 'plotters-doc-data' dir exists under current dir");

@@ -1,4 +1,3 @@
-
 // Note:
 //   fortran    rust
 //    real*4 -> f32
@@ -74,8 +73,20 @@ impl Ran2 {
             }
         }
 
-        update(&mut state.idum, params.ia_1, params.iq_1, params.ir_1, params.im_1);
-        update(&mut state.idum2, params.ia_2, params.iq_2, params.ir_2, params.im_2);
+        update(
+            &mut state.idum,
+            params.ia_1,
+            params.iq_1,
+            params.ir_1,
+            params.im_1,
+        );
+        update(
+            &mut state.idum2,
+            params.ia_2,
+            params.iq_2,
+            params.ir_2,
+            params.im_2,
+        );
 
         let j = state.iy / params.n_div;
         state.iy = state.iv[j as usize] - state.idum2;
@@ -93,8 +104,7 @@ pub struct Ran2State {
     pub iy: i32,
 }
 
-impl Ran2State {
-}
+impl Ran2State {}
 
 pub struct Ran2Params {
     pub im_1: i32,
@@ -129,7 +139,7 @@ impl Ran2Params {
         assert!(n_tab > 0, "n_tab must be positive");
 
         let im_1 = 2147483563;
-        let imm_1= im_1 - 1;
+        let imm_1 = im_1 - 1;
         let n_tab = n_tab as i32;
         let eps = 1.2e-7;
         Self {

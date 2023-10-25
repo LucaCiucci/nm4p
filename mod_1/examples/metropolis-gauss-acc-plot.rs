@@ -1,17 +1,14 @@
-
-use mod_1::metropolis_1d::{MH1D, kernels::UniformKernel};
-use nm4p_common::{lerp, indicatif, rand};
+use mod_1::metropolis_1d::{kernels::UniformKernel, MH1D};
+use nm4p_common::{indicatif, lerp, rand};
 use rand::SeedableRng;
 
 fn main() {
-
     let mut acceptances: Vec<(f64, f64)> = Vec::new();
 
     let n_mc_iter = 10000000;
     let n_subdivisions = 100;
     let delta_range = 0.001..=10000.0f64;
 
-    
     let bar = indicatif::ProgressBar::new(n_subdivisions);
 
     for i in 1..=n_subdivisions {
@@ -21,8 +18,9 @@ fn main() {
         let delta = lerp(
             delta_range.start().ln(),
             delta_range.end().ln(),
-            i as f64 / n_subdivisions as f64
-        ).exp();
+            i as f64 / n_subdivisions as f64,
+        )
+        .exp();
 
         let metro = MH1D::new(
             |x: f64| (-(x).powi(2) / (2.0)).exp(),
@@ -34,7 +32,8 @@ fn main() {
             .iter(&mut rng)
             .take(n_mc_iter)
             .filter(|(_, accepted)| *accepted)
-            .count() as f64 / n_mc_iter as f64;
+            .count() as f64
+            / n_mc_iter as f64;
 
         acceptances.push((delta, accepted));
     }
@@ -72,7 +71,9 @@ fn plot(acceptances: &Vec<(f64, f64)>) -> Result<(), Box<dyn std::error::Error>>
 
     chart.draw_series(
         //points.iter().enumerate().map(|(i, y)| Cross::new((i as f64, *y), 3, BLACK.filled())),
-        acceptances.iter().map(|(delta, acc)| Cross::new((*delta, *acc), 3, BLACK.filled())),
+        acceptances
+            .iter()
+            .map(|(delta, acc)| Cross::new((*delta, *acc), 3, BLACK.filled())),
     )?;
 
     root.present().expect("Unable to write result to file, please make sure 'plotters-doc-data' dir exists under current dir");
@@ -109,7 +110,9 @@ fn plot_log(acceptances: &Vec<(f64, f64)>) -> Result<(), Box<dyn std::error::Err
 
     chart.draw_series(
         //points.iter().enumerate().map(|(i, y)| Cross::new((i as f64, *y), 3, BLACK.filled())),
-        acceptances.iter().map(|(delta, acc)| Cross::new((*delta, *acc), 3, BLACK.filled())),
+        acceptances
+            .iter()
+            .map(|(delta, acc)| Cross::new((*delta, *acc), 3, BLACK.filled())),
     )?;
 
     root.present().expect("Unable to write result to file, please make sure 'plotters-doc-data' dir exists under current dir");

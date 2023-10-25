@@ -1,6 +1,5 @@
 use crate::congruent_generator::{CongruentGenerator, Parameters, DEFAULT_SEED};
 
-
 /// Create a new "`ran0`" generator.
 ///
 /// The generator is a congruent random number generator with parameters

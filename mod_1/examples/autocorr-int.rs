@@ -1,6 +1,5 @@
-
-use mod_1::metropolis_1d::{MH1D, kernels::UniformKernel};
-use nm4p_common::{stat::autocorr_int, clap, rand};
+use mod_1::metropolis_1d::{kernels::UniformKernel, MH1D};
+use nm4p_common::{clap, rand, stat::autocorr_int};
 use rand::SeedableRng;
 
 use clap::Parser;
@@ -52,23 +51,21 @@ fn plot(corr: Vec<f64>, args: &Args) -> Result<(), Box<dyn std::error::Error>> {
 
     root.fill(&WHITE)?;
 
-    let min = *corr.iter().min_by(|x, y| x.partial_cmp(y).unwrap()).unwrap();
-    let max = *corr.iter().max_by(|x, y| x.partial_cmp(y).unwrap()).unwrap();
+    let min = *corr
+        .iter()
+        .min_by(|x, y| x.partial_cmp(y).unwrap())
+        .unwrap();
+    let max = *corr
+        .iter()
+        .max_by(|x, y| x.partial_cmp(y).unwrap())
+        .unwrap();
 
     let mut chart = ChartBuilder::on(&root)
         .margin(10)
-        .caption(
-            format!(
-                "integrated autocorrelation"
-            ),
-            ("sans-serif", 15),
-        )
+        .caption(format!("integrated autocorrelation"), ("sans-serif", 15))
         .set_label_area_size(LabelAreaPosition::Left, 60)
         .set_label_area_size(LabelAreaPosition::Bottom, 40)
-        .build_cartesian_2d(
-            0.0..corr.len() as f64,
-            min..max,
-        )?;
+        .build_cartesian_2d(0.0..corr.len() as f64, min..max)?;
 
     chart
         .configure_mesh()
@@ -79,7 +76,9 @@ fn plot(corr: Vec<f64>, args: &Args) -> Result<(), Box<dyn std::error::Error>> {
 
     chart.draw_series(
         //points.iter().enumerate().map(|(i, y)| Cross::new((i as f64, *y), 3, BLACK.filled())),
-        corr.iter().enumerate().map(|(i, y)| Cross::new((i as f64, *y), 3, BLACK.filled())),
+        corr.iter()
+            .enumerate()
+            .map(|(i, y)| Cross::new((i as f64, *y), 3, BLACK.filled())),
     )?;
 
     root.present().expect("Unable to write result to file, please make sure 'plotters-doc-data' dir exists under current dir");

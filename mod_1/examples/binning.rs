@@ -1,8 +1,11 @@
 use std::collections::BTreeMap;
 
-use nm4p_common::{lerp, stat::{binning, var, mean_var, autocorr_int_inner, autocorr_fft, estimate_rough_tau_int}, indicatif, clap, rand_distr, rand};
 use clap::Parser;
-use rand::{SeedableRng, prelude::Distribution};
+use nm4p_common::{
+    clap, indicatif, lerp, rand, rand_distr,
+    stat::{autocorr_fft, autocorr_int_inner, binning, estimate_rough_tau_int, mean_var, var},
+};
+use rand::{prelude::Distribution, SeedableRng};
 
 #[derive(Parser)]
 struct Args {
@@ -33,11 +36,15 @@ fn main() {
 
     let tau_int = (-1.0 / args.tau).exp() / (1.0 - (-1.0 / args.tau).exp());
 
-    let k = |i: usize| lerp(
-        (1.0f64).ln(),
-        (args.k_max as f64).ln(),
-        i as f64 / args.subdivisions as f64
-    ).exp().round() as usize;
+    let k = |i: usize| {
+        lerp(
+            (1.0f64).ln(),
+            (args.k_max as f64).ln(),
+            i as f64 / args.subdivisions as f64,
+        )
+        .exp()
+        .round() as usize
+    };
 
     let bar = indicatif::ProgressBar::new(args.repetitions as u64);
 
@@ -61,22 +68,14 @@ fn main() {
 
         for i_k in 0..=args.subdivisions {
             let k = k(i_k);
-            let (n_bins, binned) = binning(
-                &samples,
-                k,
-            );
-            let (n_bins_2, binned_2) = binning(
-                &samples,
-                k * 2,
-            );
+            let (n_bins, binned) = binning(&samples, k);
+            let (n_bins_2, binned_2) = binning(&samples, k * 2);
             let tau_int_2_p1 = (var(binned.into_iter()) / n_bins as f64) / var_mu_orig;
             let tau_int = (tau_int_2_p1 - 1.0) / 2.0;
-            let tau_int_2_p1_bc = (var(binned_2.into_iter()) / n_bins_2 as f64) / var_mu_orig * 2.0 - tau_int_2_p1;
+            let tau_int_2_p1_bc =
+                (var(binned_2.into_iter()) / n_bins_2 as f64) / var_mu_orig * 2.0 - tau_int_2_p1;
             let tau_int_bc = (tau_int_2_p1_bc - 1.0) / 2.0;
-            tau_ints
-                .entry(k)
-                .or_insert_with(Vec::new)
-                .push(tau_int);
+            tau_ints.entry(k).or_insert_with(Vec::new).push(tau_int);
             tau_ints_bc
                 .entry(k * 2)
                 .or_insert_with(Vec::new)
@@ -112,26 +111,34 @@ fn main() {
 
     let (rough_tau_int, var_rough_tau_int) = mean_var(rough_tau_ints.into_iter());
 
-    plot(args.tau, tau_int, tau_ints, tau_ints_bc, tau_ints_explicit_summation, rough_tau_int, var_rough_tau_int, &args).unwrap();
+    plot(
+        args.tau,
+        tau_int,
+        tau_ints,
+        tau_ints_bc,
+        tau_ints_explicit_summation,
+        rough_tau_int,
+        var_rough_tau_int,
+        &args,
+    )
+    .unwrap();
 }
 
-fn make_samples(
-    tau: f64,
-    n: usize,
-    rng: &mut impl rand::Rng,
-) -> Vec<f64> {
-    (0..n).map({
-        let a = (-1.0 / tau).exp();
-        let b = (1.0 - a.powi(2)).sqrt();
-        let normal = rand_distr::Normal::new(0.0, 1.0).unwrap();
-        let mut last = normal.sample(rng);
-        move |_| {
-            let y = normal.sample(rng);
-            let x = a * last + b * y;
-            last = x;
-            x
-        }
-    }).collect()
+fn make_samples(tau: f64, n: usize, rng: &mut impl rand::Rng) -> Vec<f64> {
+    (0..n)
+        .map({
+            let a = (-1.0 / tau).exp();
+            let b = (1.0 - a.powi(2)).sqrt();
+            let normal = rand_distr::Normal::new(0.0, 1.0).unwrap();
+            let mut last = normal.sample(rng);
+            move |_| {
+                let y = normal.sample(rng);
+                let x = a * last + b * y;
+                last = x;
+                x
+            }
+        })
+        .collect()
 }
 
 fn plot(
@@ -157,10 +164,7 @@ fn plot(
         .set_label_area_size(LabelAreaPosition::Left, 40)
         .set_label_area_size(LabelAreaPosition::Bottom, 40)
         .set_label_area_size(LabelAreaPosition::Top, 40)
-        .build_cartesian_2d(
-            x_range.clone().log_scale(),
-            0.0..1.1,
-        )?
+        .build_cartesian_2d(x_range.clone().log_scale(), 0.0..1.1)?
         .set_secondary_coord(
             ((args.n as f64)..(args.n as f64 / args.k_max as f64)).log_scale(),
             0.0..1.1,
@@ -182,94 +186,107 @@ fn plot(
         .axis_desc_style(("sans-serif", 20))
         .draw()?;
 
-    chart.draw_series(
-        LineSeries::new(
-            [
-                (x_range.start, 1.0),
-                (x_range.end, 1.0),
-            ],
+    chart
+        .draw_series(LineSeries::new(
+            [(x_range.start, 1.0), (x_range.end, 1.0)],
             BLACK.stroke_width(1),
-        )
-    )?
+        ))?
         .label("tau_exp")
         .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], BLACK));
-    chart.draw_series(
-        LineSeries::new(
+    chart
+        .draw_series(LineSeries::new(
             [
                 (x_range.start, tau_int / tau_exp),
                 (x_range.end, tau_int / tau_exp),
             ],
             RED.stroke_width(2),
-        )
-    )?
+        ))?
         .label("tau_int")
         .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], RED));
 
     if args.comparison {
         // rough tau_int
-        chart.draw_series(
-            LineSeries::new(
+        chart
+            .draw_series(LineSeries::new(
                 [
                     (x_range.start, rough_tau_int / tau_exp),
                     (x_range.end, rough_tau_int / tau_exp),
                 ],
                 GREEN.stroke_width(1),
-            )
-        )?
+            ))?
             .label("tau_int (rough)")
             .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], GREEN));
-        chart.draw_series(
-            std::iter::once(Polygon::new(
-                [
-                    (x_range.end, (rough_tau_int + var_rough_tau_int.sqrt()) / tau_exp),
-                    (x_range.start, (rough_tau_int + var_rough_tau_int.sqrt()) / tau_exp),
-                    (x_range.start, (rough_tau_int - var_rough_tau_int.sqrt()) / tau_exp),
-                    (x_range.end, (rough_tau_int - var_rough_tau_int.sqrt()) / tau_exp)
-                ],
-                &GREEN.mix(0.2),
-            ))
-        )?;
+        chart.draw_series(std::iter::once(Polygon::new(
+            [
+                (
+                    x_range.end,
+                    (rough_tau_int + var_rough_tau_int.sqrt()) / tau_exp,
+                ),
+                (
+                    x_range.start,
+                    (rough_tau_int + var_rough_tau_int.sqrt()) / tau_exp,
+                ),
+                (
+                    x_range.start,
+                    (rough_tau_int - var_rough_tau_int.sqrt()) / tau_exp,
+                ),
+                (
+                    x_range.end,
+                    (rough_tau_int - var_rough_tau_int.sqrt()) / tau_exp,
+                ),
+            ],
+            &GREEN.mix(0.2),
+        )))?;
     }
 
-    let mut draw_tau_series = |
-        name: &str,
-        tau_ints_explicit_summation: &[(usize, f64, f64)],
-        color: RGBColor,
-    | {
-        chart.draw_series(
-            std::iter::once(Polygon::new(
-                tau_ints_explicit_summation
-                    .iter()
-                    .rev()
-                    .map(|(k, tau, var_tau)| (*k as f64 / tau_exp, (*tau + var_tau.sqrt()) / tau_exp))
-                    .chain(
-                        tau_ints_explicit_summation
-                            .iter()
-                            .map(|(k, tau, var_tau)| (*k as f64 / tau_exp, (*tau - var_tau.sqrt()) / tau_exp))
-                    )
-                    .collect::<Vec<_>>(),
-                &color.mix(0.2),
-            ))
-        ).unwrap();
-    
-        chart.draw_series(
-            tau_ints_explicit_summation.iter().map(|(k, sigma, var_sigma)| ErrorBar::new_vertical(
-                *k as f64 / tau_exp,
-                (*sigma - var_sigma.sqrt()) / tau_exp,
-                (*sigma) / tau_exp,
-                (*sigma + var_sigma.sqrt()) / tau_exp,
-                color.filled(),
-                5
-            ))
-        ).unwrap();
-    
-        chart.draw_series(LineSeries::new(
-            tau_ints_explicit_summation.iter().map(|(k, sigma, _var_sigma)| (*k as f64 / tau_exp, *sigma / tau_exp)),
-            &color,
-        )).unwrap()
-            .label(name)
-            .legend(move |(x, y)| ErrorBar::new_vertical(x + 10, y - 5, y, y + 5, color.filled(), 5));
-    };
+    let mut draw_tau_series =
+        |name: &str, tau_ints_explicit_summation: &[(usize, f64, f64)], color: RGBColor| {
+            chart
+                .draw_series(std::iter::once(Polygon::new(
+                    tau_ints_explicit_summation
+                        .iter()
+                        .rev()
+                        .map(|(k, tau, var_tau)| {
+                            (*k as f64 / tau_exp, (*tau + var_tau.sqrt()) / tau_exp)
+                        })
+                        .chain(tau_ints_explicit_summation.iter().map(|(k, tau, var_tau)| {
+                            (*k as f64 / tau_exp, (*tau - var_tau.sqrt()) / tau_exp)
+                        }))
+                        .collect::<Vec<_>>(),
+                    &color.mix(0.2),
+                )))
+                .unwrap();
+
+            chart
+                .draw_series(
+                    tau_ints_explicit_summation
+                        .iter()
+                        .map(|(k, sigma, var_sigma)| {
+                            ErrorBar::new_vertical(
+                                *k as f64 / tau_exp,
+                                (*sigma - var_sigma.sqrt()) / tau_exp,
+                                (*sigma) / tau_exp,
+                                (*sigma + var_sigma.sqrt()) / tau_exp,
+                                color.filled(),
+                                5,
+                            )
+                        }),
+                )
+                .unwrap();
+
+            chart
+                .draw_series(LineSeries::new(
+                    tau_ints_explicit_summation
+                        .iter()
+                        .map(|(k, sigma, _var_sigma)| (*k as f64 / tau_exp, *sigma / tau_exp)),
+                    &color,
+                ))
+                .unwrap()
+                .label(name)
+                .legend(move |(x, y)| {
+                    ErrorBar::new_vertical(x + 10, y - 5, y, y + 5, color.filled(), 5)
+                });
+        };
 
     if args.comparison {
         draw_tau_series("explicit c_k summation", &tau_ints_explicit_summation, RED);

@@ -1,5 +1,3 @@
-
-
 pub struct Ran1 {
     state: Ran1State,
     params: Ran1Params,
@@ -32,11 +30,7 @@ impl Ran1 {
 
         Self {
             params,
-            state: Ran1State {
-                idum,
-                iv,
-                iy,
-            },
+            state: Ran1State { idum, iv, iy },
         }
     }
 
@@ -51,7 +45,8 @@ impl Ran1 {
 
     fn step(&mut self) {
         let k = self.state.idum / self.params.iq;
-        self.state.idum = self.params.ia * (self.state.idum - k * self.params.iq) - k * self.params.ir;
+        self.state.idum =
+            self.params.ia * (self.state.idum - k * self.params.iq) - k * self.params.ir;
         if self.state.idum < 0 {
             self.state.idum += self.params.im;
         }

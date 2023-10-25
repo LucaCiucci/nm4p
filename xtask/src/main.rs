@@ -8,7 +8,8 @@ fn main() {
     let doc = &yaml[0];
 
     let tasks = doc
-        .as_hash().unwrap()
+        .as_hash()
+        .unwrap()
         .iter()
         .map(|a| a.0.as_str().unwrap())
         .collect::<Vec<_>>();
@@ -20,7 +21,7 @@ fn main() {
         } else if let Some(v) = doc[task_name].as_vec() {
             v.iter()
                 .map(|a| {
-                    let s = if let Some(s) = a.as_str(){
+                    let s = if let Some(s) = a.as_str() {
                         s.split(" ").map(|s| s.to_string()).collect::<Vec<_>>()
                     } else if let Some(n) = a.as_i64() {
                         vec![n.to_string().to_string()]

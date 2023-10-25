@@ -1,17 +1,14 @@
-
-use mod_1::metropolis_1d::{MH1D, kernels::UniformKernel};
-use nm4p_common::{lerp, indicatif, stat::estimate_rough_tau_int, rand};
+use mod_1::metropolis_1d::{kernels::UniformKernel, MH1D};
+use nm4p_common::{indicatif, lerp, rand, stat::estimate_rough_tau_int};
 use rand::SeedableRng;
 
 fn main() {
-
     let mut tau_vs_acceptances: Vec<(f64, f64)> = Vec::new();
 
     let n_mc_iter = 1000000;
     let n_subdivisions = 200;
     let delta_range = 0.1..=10000.0f64;
 
-    
     let bar = indicatif::ProgressBar::new(n_subdivisions);
 
     for i in 1..=n_subdivisions {
@@ -21,8 +18,9 @@ fn main() {
         let delta = lerp(
             delta_range.start().ln(),
             delta_range.end().ln(),
-            i as f64 / n_subdivisions as f64
-        ).exp();
+            i as f64 / n_subdivisions as f64,
+        )
+        .exp();
 
         let (samples, acceptance) = {
             let metro = MH1D::new(
@@ -81,7 +79,10 @@ fn plot(tau_vs_acceptances: &Vec<(f64, f64)>) -> Result<(), Box<dyn std::error::
 
     chart.draw_series(
         //points.iter().enumerate().map(|(i, y)| Cross::new((i as f64, *y), 3, BLACK.filled())),
-        tau_vs_acceptances.iter().filter(|(_, tau_int)| *tau_int > 0.0).map(|(acceptance, tau_int)| Cross::new((*acceptance, *tau_int), 3, BLACK.filled())),
+        tau_vs_acceptances
+            .iter()
+            .filter(|(_, tau_int)| *tau_int > 0.0)
+            .map(|(acceptance, tau_int)| Cross::new((*acceptance, *tau_int), 3, BLACK.filled())),
     )?;
 
     root.present().expect("Unable to write result to file, please make sure 'plotters-doc-data' dir exists under current dir");

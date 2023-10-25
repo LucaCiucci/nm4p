@@ -1,6 +1,8 @@
-
-use nm4p_common::{stat::{mean_var, estimate_tau_int}, indicatif, rand_distr, rand};
-use rand::{SeedableRng, prelude::Distribution};
+use nm4p_common::{
+    indicatif, rand, rand_distr,
+    stat::{estimate_tau_int, mean_var},
+};
+use rand::{prelude::Distribution, SeedableRng};
 
 const TAU_EXP: f64 = 10.0;
 const N: usize = 1_000_000;
@@ -25,9 +27,16 @@ fn main() {
     drop(bar);
 
     let (mean, var) = mean_var(evaluations.iter().cloned());
-    println!("estimated tau_int: {} ± {} (with std dev: {}), expected: {}", mean, (var / evaluations.len() as f64).sqrt(), var.sqrt(), tau_int);
+    println!(
+        "estimated tau_int: {} ± {} (with std dev: {}), expected: {}",
+        mean,
+        (var / evaluations.len() as f64).sqrt(),
+        var.sqrt(),
+        tau_int
+    );
 
-    let doc = format!(r##"
+    let doc = format!(
+        r##"
 estimated: {}
 uncertainty: {}
 std_dev: {}
@@ -42,21 +51,19 @@ expected: {}
     std::fs::write("mod_1/img/plots/test-tau-int-estimate.yaml", doc).unwrap();
 }
 
-fn make_samples(
-    tau: f64,
-    n: usize,
-    rng: &mut impl rand::Rng,
-) -> Vec<f64> {
-    (0..n).map({
-        let a = (-1.0 / tau).exp();
-        let b = (1.0 - a.powi(2)).sqrt();
-        let normal = rand_distr::Normal::new(0.0, 1.0).unwrap();
-        let mut last = normal.sample(rng);
-        move |_| {
-            let y = normal.sample(rng);
-            let x = a * last + b * y;
-            last = x;
-            x
-        }
-    }).collect()
+fn make_samples(tau: f64, n: usize, rng: &mut impl rand::Rng) -> Vec<f64> {
+    (0..n)
+        .map({
+            let a = (-1.0 / tau).exp();
+            let b = (1.0 - a.powi(2)).sqrt();
+            let normal = rand_distr::Normal::new(0.0, 1.0).unwrap();
+            let mut last = normal.sample(rng);
+            move |_| {
+                let y = normal.sample(rng);
+                let x = a * last + b * y;
+                last = x;
+                x
+            }
+        })
+        .collect()
 }

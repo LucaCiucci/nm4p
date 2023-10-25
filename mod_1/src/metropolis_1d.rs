@@ -13,11 +13,7 @@ where
     T: Target,
     K: ProposalKernel,
 {
-    pub fn new(
-        target: T,
-        x_0: f64,
-        proposal_kernel: K,
-    ) -> Self {
+    pub fn new(target: T, x_0: f64, proposal_kernel: K) -> Self {
         Self {
             target,
             x: x_0,
@@ -50,10 +46,7 @@ where
     }
 
     pub fn iter(self, rng: &mut dyn RngCore) -> MH1DIterator<T, K> {
-        MH1DIterator {
-            mh: self,
-            rng,
-        }
+        MH1DIterator { mh: self, rng }
     }
 
     /// Returns true with probability `p`
@@ -129,10 +122,7 @@ pub mod kernels {
 
     impl ProposalKernel for UniformKernel {
         fn propose(&mut self, x: f64, rng: &mut dyn RngCore) -> (f64, f64) {
-            (
-                x + self.delta * (rng.gen::<f64>() - 0.5),
-                1.0,
-            )
+            (x + self.delta * (rng.gen::<f64>() - 0.5), 1.0)
         }
     }
 }

@@ -1,6 +1,8 @@
-
-use mod_1::metropolis_1d::{MH1D, kernels::UniformKernel};
-use nm4p_common::{stat::{autocorr_plain, autocorr_fft}, clap, rand};
+use mod_1::metropolis_1d::{kernels::UniformKernel, MH1D};
+use nm4p_common::{
+    clap, rand,
+    stat::{autocorr_fft, autocorr_plain},
+};
 use rand::SeedableRng;
 
 use clap::Parser;
@@ -46,7 +48,8 @@ fn main() {
         .take(args.max_k)
         .collect::<Vec<_>>();
 
-    let max_diff = c.iter()
+    let max_diff = c
+        .iter()
         .zip(c_plain.iter())
         .map(|(x, y)| (x - y).abs())
         .max_by(|x, y| x.partial_cmp(y).unwrap())
@@ -63,26 +66,25 @@ fn plot(corr: Vec<f64>, args: &Args) -> Result<(), Box<dyn std::error::Error>> {
 
     root.fill(&WHITE)?;
 
-    let min = *corr.iter().min_by(|x, y| x.partial_cmp(y).unwrap()).unwrap();
-    let max = *corr.iter().max_by(|x, y| x.partial_cmp(y).unwrap()).unwrap();
+    let min = *corr
+        .iter()
+        .min_by(|x, y| x.partial_cmp(y).unwrap())
+        .unwrap();
+    let max = *corr
+        .iter()
+        .max_by(|x, y| x.partial_cmp(y).unwrap())
+        .unwrap();
 
     let mut chart_builder = ChartBuilder::on(&root);
 
     chart_builder.margin(10);
-    chart_builder.caption(
-        format!(
-            "autocorrelation"
-        ),
-        ("sans-serif", 15),
-    );
+    chart_builder.caption(format!("autocorrelation"), ("sans-serif", 15));
     chart_builder.set_label_area_size(LabelAreaPosition::Left, 60);
     chart_builder.set_label_area_size(LabelAreaPosition::Bottom, 40);
 
     if args.y_log {
-        let mut chart = chart_builder.build_cartesian_2d(
-            0.0..corr.len() as f64,
-            (0.001..1.0).log_scale(),
-        )?;
+        let mut chart =
+            chart_builder.build_cartesian_2d(0.0..corr.len() as f64, (0.001..1.0).log_scale())?;
 
         chart
             .configure_mesh()
@@ -93,13 +95,12 @@ fn plot(corr: Vec<f64>, args: &Args) -> Result<(), Box<dyn std::error::Error>> {
 
         chart.draw_series(
             //points.iter().enumerate().map(|(i, y)| Cross::new((i as f64, *y), 3, BLACK.filled())),
-            corr.iter().enumerate().map(|(i, y)| Cross::new((i as f64, *y), 3, BLACK.filled())),
+            corr.iter()
+                .enumerate()
+                .map(|(i, y)| Cross::new((i as f64, *y), 3, BLACK.filled())),
         )?;
     } else {
-        let mut chart = chart_builder.build_cartesian_2d(
-            0.0..corr.len() as f64,
-            min..max,
-        )?;
+        let mut chart = chart_builder.build_cartesian_2d(0.0..corr.len() as f64, min..max)?;
 
         chart
             .configure_mesh()
@@ -110,7 +111,9 @@ fn plot(corr: Vec<f64>, args: &Args) -> Result<(), Box<dyn std::error::Error>> {
 
         chart.draw_series(
             //points.iter().enumerate().map(|(i, y)| Cross::new((i as f64, *y), 3, BLACK.filled())),
-            corr.iter().enumerate().map(|(i, y)| Cross::new((i as f64, *y), 3, BLACK.filled())),
+            corr.iter()
+                .enumerate()
+                .map(|(i, y)| Cross::new((i as f64, *y), 3, BLACK.filled())),
         )?;
     };
 
