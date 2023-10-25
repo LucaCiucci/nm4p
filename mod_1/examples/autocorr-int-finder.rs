@@ -1,6 +1,6 @@
 
 use mod_1::metropolis_1d::{MH1D, kernels::UniformKernel};
-use nm4p_common::{stat::{autocorr_int, autocorr_fft, estimate_rough_tau_int_impl, RoughTauIntEstimationMethod::*}, clap};
+use nm4p_common::{stat::{autocorr_int, autocorr_fft, estimate_rough_tau_int_impl, RoughTauIntEstimationMethod::*}, clap, rand};
 use rand::SeedableRng;
 
 use clap::Parser;

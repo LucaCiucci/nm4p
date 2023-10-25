@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use nm4p_common::{lerp, stat::{binning, var, mean_var, autocorr_int_inner, autocorr_fft, estimate_rough_tau_int_impl, estimate_rough_tau_int}, indicatif, clap, rand_distr, rand};
+use nm4p_common::{lerp, stat::{binning, var, mean_var, autocorr_int_inner, autocorr_fft, estimate_rough_tau_int}, indicatif, clap, rand_distr, rand};
 use clap::Parser;
 use rand::{SeedableRng, prelude::Distribution};
 

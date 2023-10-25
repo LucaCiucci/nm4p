@@ -1,6 +1,6 @@
 
 use mod_1::metropolis_1d::{MH1D, kernels::UniformKernel};
-use nm4p_common::{stat::{estimate_rough_tau_int_impl, mean_var, RoughTauIntEstimationMethod::*}, indicatif::{self, ProgressStyle}, lerp};
+use nm4p_common::{stat::{estimate_rough_tau_int_impl, mean_var, RoughTauIntEstimationMethod::*}, indicatif::{self, ProgressStyle}, lerp, rand};
 use rand::SeedableRng;
 
 fn main() {

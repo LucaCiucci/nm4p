@@ -1,6 +1,6 @@
 
 use mod_1::metropolis_1d::{MH1D, kernels::UniformKernel};
-use nm4p_common::{lerp, indicatif};
+use nm4p_common::{lerp, indicatif, rand};
 use rand::SeedableRng;
 
 fn main() {

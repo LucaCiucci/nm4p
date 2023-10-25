@@ -1,6 +1,6 @@
 
 use mod_1::metropolis_1d::{MH1D, kernels::UniformKernel};
-use nm4p_common::{clap, stat::mean_var};
+use nm4p_common::{clap, stat::mean_var, rand};
 use clap::Parser;
 use rand::SeedableRng;
 

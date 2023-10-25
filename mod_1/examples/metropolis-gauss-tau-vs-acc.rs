@@ -1,6 +1,6 @@
 
 use mod_1::metropolis_1d::{MH1D, kernels::UniformKernel};
-use nm4p_common::{lerp, indicatif, stat::estimate_rough_tau_int};
+use nm4p_common::{lerp, indicatif, stat::estimate_rough_tau_int, rand};
 use rand::SeedableRng;
 
 fn main() {
