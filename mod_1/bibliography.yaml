@@ -39,6 +39,7 @@ rustfft:
 levenberg-marquardt:
   type: Article
   title: The Levenberg-Marquardt algorithm for nonlinear least squares curve-fitting problems
+  date: 2022/11/27
   url: https://people.duke.edu/~hpgavin/ExperimentalSystems/lm.pdf
 
 autocorr-daniel:
@@ -53,7 +54,7 @@ ensemble-sampler-section-5:
   type: Article
   title: Ensemble samplers with affine invariance - section 5
   date: 2010
-  doi: http://dx.doi.org/10.2140/camcos.2010.5.65
+  doi: 10.2140/camcos.2010.5.65
   #url: https://msp.org/camcos/2010/5-1/camcos-v5-n1-p04-s.pdf
   url: https://msp.org/camcos/2010/5-1/p04.xhtml
   author:
@@ -91,3 +92,16 @@ betanalpha-mcmc-in-practice:
   author: Michael Betancourt
   date: 2020/05
   url: https://betanalpha.github.io/assets/case_studies/markov_chain_monte_carlo.html
+
+chebyshev-wikipedia:
+  type: Webpage
+  title: Chebyshev inequality #Čebyšëv inequality
+  url: https://en.wikipedia.org/wiki/Chebyshev%27s_inequality
+
+stochastic-ADMC:
+  type: Article
+  title: Stochastic automatic differentiation for Monte Carlo processes
+  date: 2023/7/28
+  author: [Guilherme Catumba, Alberto Ramos, Bryan Zaldivar]
+  url: https://arxiv.org/abs/2307.15406
+  doi: 10.48550/arXiv.2307.15406

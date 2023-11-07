@@ -11,7 +11,7 @@
   // Set the document's basic properties.
   set document(author: authors.map(a => a.name), title: title)
   set page(numbering: "1", number-align: center)
-  set text(font: "Linux Libertine", lang: "it")
+  set text(font: "Linux Libertine", lang: "en")
 
   // Title row.
   align(center)[

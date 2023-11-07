@@ -4,10 +4,13 @@ pub use rand;
 pub use rand_distr;
 pub use rustfft;
 pub use yaml_rust;
+pub use num_traits;
+pub use differential;
 
 use std::ops::Deref;
 
 pub mod stat;
+pub mod interpolation;
 
 pub struct Immutable<T> {
     value: T,

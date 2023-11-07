@@ -27,8 +27,10 @@
   show ref: ref => text(ref, rgb("#0000CD").darken(50%))
 
   //show image: image => []
+  //show image: image => hide(image)
+  //show: rest => hide(rest)
 
-  import "@local/bob-draw:0.1.0": *
+  import "@preview/bob-draw:0.1.0": *
   show raw.where(lang: "bob"): it => render(it.text)
   show raw.where(lang: "bob-5"): it => render(it.text, width: 5%)
   show raw.where(lang: "bob-10"): it => render(it.text, width: 10%)

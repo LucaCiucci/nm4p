@@ -598,7 +598,7 @@
   callout(
       color: gray,
       header: [#sym.square #underline[*proof*]: #title],
-      proof
+      proof// + sym.square
   )
 }
 
