@@ -1,5 +1,9 @@
 #set page(paper: "a5")
 
+#import "../../common-typst/defs.typ": *
+
+#show: common_styles
+
 Monte carlo for quantum mechanics
 $
 lr(angle.l O angle.r) = "Tr"(e^(-beta H) angle.l O angle.r) / "Tr"(e^(-beta H))
@@ -42,3 +46,26 @@ $
 And, here, we could take $cal(F)^(-1)$ and use $E_n in RR$ to estimate the spectrum, scaling the eigenvalues by a factor so that $E_0$ matches the ground state energy estimated with other methods (because we don't know the pre-factor $1\/Z(beta)$).
 
 Prof says this won't work $-->$ ... but I think maybe $x(tau) -> tilde(x)(tau)$ using Fourier could solve the divergence problem... Also maybe evaluate $Z(beta + i a)$ might be much easier than $Z(i a)$, but using $cal(F)^(-1)$ would be a little more tricky (maybe a mix of Fourier and Laplace transform, nothing too exoteric but complex in practice).
+
+Still wrong... real solution might be https://arxiv.org/pdf/physics/0505109.pdf
+
+```bob-50
+^"time"
+| *---*---*---*---*---*---*
+| |   |   |   |   |   |   |
+| *---*---*---*---*---*---*
+| |   |   |   |   |   |   |
+| *---*---*---*---*---*---*
+| |   |   |   |   |   |   |
+| *---*---*---*---*---*---*
+| |   |   |   |   |   |   |
+| *---*---*---*---*---*---*
+| |   |   |   |   |   |   |
+| *---*---*---*---*---*---*
+| |   |   |   |   |   |   |
+| *---*---*---*---*---*---*
+| |   |   |   |   |   |   |
+| *---*---*---*---*---*---*
++--------------------------->
+                "coordinates"
+```
