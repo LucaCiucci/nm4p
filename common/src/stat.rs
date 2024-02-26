@@ -1,5 +1,6 @@
-use std::borrow::Borrow;
+use std::{borrow::Borrow, ops::{Add, AddAssign, Mul, MulAssign}};
 
+use nalgebra::DefaultAllocator;
 use num_traits::{Float, FromPrimitive};
 
 /// Computes the mean and variance of the iterator.
@@ -329,4 +330,91 @@ pub fn tau_int_from_ess_over_n(ess_over_n: f64) -> f64 {
 
 pub fn ess_over_n_from_tau_int(tau_int: f64) -> f64 {
     tau_int * 2.0 + 1.0
+}
+
+/// Computes the covariance matrix of a function
+///
+/// Given a function `f` and its jacobian matrix `j`, this function computes the covariance matrix of the output values:  
+/// `Cov_f = j * sigma * jᵗ`  
+/// where `Cov_x` is the covariance matrix of the input values, `J_f` is the jacobian matrix of the function and `J_fᵗ` is the transpose of the jacobian matrix.
+///
+/// # Arguments
+/// * `j` - The jacobian matrix of the function
+/// * `sigma` - The covariance matrix of the input values
+///
+/// # Remarks
+/// The jacobian number of rows equals the number of output values, while the number of columns equals the number of input values.
+///
+/// # Panics
+/// Panics if the number of columns of `j` is different from the number of rows of `sigma`.
+pub fn propagate_cov_matrix<T, M, N, JStorage, CStorage>(
+    j: &nalgebra::Matrix<T, N, M, JStorage>,
+    sigma: &nalgebra::Matrix<T, M, M, CStorage>,
+) -> nalgebra::Matrix<T, N, N, <DefaultAllocator as nalgebra::allocator::Allocator<T, N, N>>::Buffer>
+where
+    T: Clone + nalgebra::Scalar + AddAssign + Add + Mul + MulAssign + num_traits::Zero + num_traits::One + std::fmt::Debug,
+    M: nalgebra::Dim,
+    N: nalgebra::Dim,
+    JStorage: nalgebra::Storage<T, N, M>,
+    CStorage: nalgebra::Storage<T, M, M>,
+    nalgebra::DefaultAllocator: nalgebra::allocator::Allocator<T, N, N>,
+    nalgebra::DefaultAllocator: nalgebra::allocator::Allocator<T, M, N>,
+    nalgebra::DefaultAllocator: nalgebra::allocator::Allocator<T, N, M>,
+{
+    assert_eq!(j.ncols(), sigma.nrows(), "function parameters and covariance matrix size mismatch");
+
+    // For performance reasons, we associate the matrix multiplication in order to
+    // reduce the intermediate memory allocation.
+    // TODO transpose will allocate a new matrix, we should avoid it maybe by using a view
+    // TODO as an optimization, maybe we could avoid producing the intermediate
+    // and transposed matrix and just explicitly implement the multiplication?
+    if j.nrows() < j.ncols() {
+        /*
+              J     *      𝜎      *  Jᵗ  =     J𝜎      *  Jᵗ
+                      /         \   / \                  / \
+        /          \ |           | |   |   /          \ |   |
+        \          / |           | |   | = \          / |   |
+                     |           | |   |                |   |
+                      \         /   \ /                  \ /
+            n x m        m x m     m x n      n x m     m x n
+        */
+        (j * sigma) * j.transpose()
+    } else {
+        /*
+          J   *  𝜎 *     Jᵗ      =   J  *      𝜎Jᵗ
+         / \                        / \
+        |   |   / \ /          \   |   |  /          \
+        |   |   \ / \          / = |   |  \          /
+        |   |                      |   |
+         \ /                        \ /
+        n x m  m x m   m x n       n x m     m x n
+        */
+        j * (sigma * j.transpose())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn propagate_cov_matrix() {
+        use nalgebra::*;
+
+        // identity: f(x, y) = (x; y)
+        let j = Matrix2::identity();
+        let sigma = Matrix2::new(
+            1.0, 0.1,
+            1.0, 0.1,
+        );
+        let cov = super::propagate_cov_matrix(&j, &sigma);
+        assert_eq!(cov, sigma);
+
+        // f(x, y) = 2 * x + 3 * y
+        let j = Matrix1x2::new(2.0, 3.0);
+        let sigma = Matrix2::new(
+            5.0, 11.0,
+            11.0, 7.0,
+        );
+        let cov = super::propagate_cov_matrix(&j, &sigma);
+        assert_eq!(cov, Matrix1::new(215.0)); // TODO check this value
+    }
 }
