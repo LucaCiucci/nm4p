@@ -33,7 +33,6 @@ fn main() {
     let mut t1s = Vec::<Vec<f64>>::from_iter((0..=n_subdivisions).map(|_| Vec::new()));
     let mut t2s = Vec::<Vec<f64>>::from_iter((0..=n_subdivisions).map(|_| Vec::new()));
 
-    let start_time = std::time::Instant::now();
     for _ in 0..repetitions {
         bar.inc(1);
         let metro = MH1D::new(
@@ -45,7 +44,6 @@ fn main() {
         let chain = metro.iter(&mut rng);
 
         let samples = chain.map(|(x, _)| x).take(iter_range.clone().max().unwrap()).collect::<Vec<_>>();
-        let elapsed = start_time.elapsed();
 
         for i in 0..=n_subdivisions {
             let iter = iter(i);
@@ -77,7 +75,6 @@ fn main() {
             plot(&tau_int_and_var_vs_iters, &tau_int_and_var_vs_iters_d).unwrap();
         }
     }
-    println!("Elapsed: {:?}", start_time.elapsed());
 }
 
 fn plot(
