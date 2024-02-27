@@ -8,14 +8,11 @@ use rand::SeedableRng;
 
 fn main() {
     let n_subdivisions = 20;
-    let iter_range = 100..=10_000_000usize;
+    let iter_range = 20..=100_000usize;
 
     let repetitions = 1_000;
 
-    let mut tau_int_and_var_vs_iters: Vec<(usize, f64, f64)> = Vec::new();
-    let mut tau_int_and_var_vs_iters_d: Vec<(usize, f64, f64)> = Vec::new();
-
-    let iter = |i: u64| {
+    let iter = |i: usize| {
         lerp(
             (*iter_range.start() as f64).ln(),
             (*iter_range.end() as f64).ln(),
@@ -29,55 +26,63 @@ fn main() {
         "{elapsed} {wide_bar} iters: {pos}/{len} {percent}% eta: {eta_precise}",
     )
     .unwrap();
-    let total: usize = (0..=n_subdivisions).map(|i| iter(i)).sum();
-    let bar = indicatif::ProgressBar::new(total as u64 * repetitions * 2).with_style(style);
+    let bar = indicatif::ProgressBar::new(repetitions).with_style(style);
 
     let mut rng = rand::rngs::StdRng::seed_from_u64(42);
 
-    for i in 0..=n_subdivisions {
-        let iter = iter(i);
+    let mut t1s = Vec::<Vec<f64>>::from_iter((0..=n_subdivisions).map(|_| Vec::new()));
+    let mut t2s = Vec::<Vec<f64>>::from_iter((0..=n_subdivisions).map(|_| Vec::new()));
 
-        let (tau_int, tau_int_var) = mean_var((0..repetitions).filter_map(|_| {
-            bar.inc(iter as u64);
+    let start_time = std::time::Instant::now();
+    for _ in 0..repetitions {
+        bar.inc(1);
+        let metro = MH1D::new(
+            |x: f64| (-(x).powi(2) / 2.0).exp(),
+            0.0,
+            UniformKernel::new(2.0),
+        );
 
-            let metro = MH1D::new(
-                |x: f64| (-(x).powi(2) / 2.0).exp(),
-                0.0,
-                UniformKernel::new(1.0),
-            );
-            let chain = metro.iter(&mut rng);
+        let chain = metro.iter(&mut rng);
 
-            let samples = chain.map(|(x, _)| x).take(iter).collect::<Vec<_>>();
+        let samples = chain.map(|(x, _)| x).take(iter_range.clone().max().unwrap()).collect::<Vec<_>>();
+        let elapsed = start_time.elapsed();
 
-            estimate_rough_tau_int_impl(&samples, Normal).map(|(_m, tau_int)| tau_int)
-        }));
+        for i in 0..=n_subdivisions {
+            let iter = iter(i);
+            let samples = &samples[..iter];
 
-        tau_int_and_var_vs_iters.push((iter, tau_int, tau_int_var));
+            let t = estimate_rough_tau_int_impl(&samples, Normal).map(|(_m, tau_int)| tau_int);
+            if let Some(t1) = t {
+                t1s[i].push(t1);
+            }
+            let t = estimate_rough_tau_int_impl(&samples, Derivative).map(|(_m, tau_int)| tau_int);
+            if let Some(t2) = t {
+                t2s[i].push(t2);
+            }
+        }
 
-        let (tau_int, tau_int_var) = mean_var((0..repetitions).filter_map(|_| {
-            bar.inc(iter as u64);
+        // plot
+        {
+            let mut tau_int_and_var_vs_iters: Vec<(usize, f64, f64)> = Vec::new();
+            let mut tau_int_and_var_vs_iters_d: Vec<(usize, f64, f64)> = Vec::new();
 
-            let metro = MH1D::new(
-                |x: f64| (-(x).powi(2) / 2.0).exp(),
-                0.0,
-                UniformKernel::new(1.0),
-            );
-            let chain = metro.iter(&mut rng);
-
-            let samples = chain.map(|(x, _)| x).take(iter).collect::<Vec<_>>();
-
-            estimate_rough_tau_int_impl(&samples, Derivative).map(|(_m, tau_int)| tau_int)
-        }));
-
-        tau_int_and_var_vs_iters_d.push((iter, tau_int, tau_int_var));
+            for i in 0..=n_subdivisions {
+                let iter = iter(i);
+                let (tau_int, tau_int_var) = mean_var(t1s[i].iter().cloned());
+                tau_int_and_var_vs_iters.push((iter, tau_int, tau_int_var));
+                let (tau_int, tau_int_var) = mean_var(t2s[i].iter().cloned());
+                tau_int_and_var_vs_iters_d.push((iter, tau_int, tau_int_var));
+            }
+        
+            plot(&tau_int_and_var_vs_iters, &tau_int_and_var_vs_iters_d).unwrap();
+        }
     }
-
-    plot(tau_int_and_var_vs_iters, tau_int_and_var_vs_iters_d).unwrap();
+    println!("Elapsed: {:?}", start_time.elapsed());
 }
 
 fn plot(
-    tau_int_and_var_vs_iters: Vec<(usize, f64, f64)>,
-    tau_int_and_var_vs_iters_d: Vec<(usize, f64, f64)>,
+    tau_int_and_var_vs_iters: &[(usize, f64, f64)],
+    tau_int_and_var_vs_iters_d: &[(usize, f64, f64)],
 ) -> Result<(), Box<dyn std::error::Error>> {
     use plotters::prelude::*;
     let path = "mod_1/img/plots/autocorr-int-finder-tau_int-vs-iter.svg";
@@ -93,7 +98,7 @@ fn plot(
         .caption(format!("tau_int vs chain len"), ("sans-serif", 15))
         .set_label_area_size(LabelAreaPosition::Left, 60)
         .set_label_area_size(LabelAreaPosition::Bottom, 40)
-        .build_cartesian_2d((min as f64..max as f64).log_scale(), 0.0..40.0)?;
+        .build_cartesian_2d((min as f64..max as f64).log_scale(), 0.0..10.0)?;
 
     chart
         .configure_mesh()

@@ -1,7 +1,8 @@
-use std::{borrow::Borrow, ops::{Add, AddAssign, Mul, MulAssign}};
+use std::{borrow::Borrow, cell::RefCell, ops::{Add, AddAssign, Mul, MulAssign}};
 
 use nalgebra::DefaultAllocator;
 use num_traits::{Float, FromPrimitive};
+use rustfft::FftPlanner;
 
 /// Computes the mean and variance of the iterator.
 ///
@@ -61,6 +62,10 @@ pub fn autocorr_plain<'a>(x: &'a [f64]) -> impl Iterator<Item = f64> + 'a {
     })
 }
 
+thread_local! {
+    static F64_FFT_PLANNER: RefCell<FftPlanner<f64>> = RefCell::new(FftPlanner::new());
+}
+
 pub fn autocorr_fft(x: &[f64]) -> Vec<f64> {
     #[allow(non_snake_case)]
     let N = x.len();
@@ -75,27 +80,30 @@ pub fn autocorr_fft(x: &[f64]) -> Vec<f64> {
         .map(|x| rustfft::num_complex::Complex::new(x, 0.0))
         .collect::<Vec<_>>();
 
-    let mut planner = rustfft::FftPlanner::new();
-    let fft = planner.plan_fft_forward(xx.len());
-    // let ifft = planner.plan_fft_inverse(xx.len()); see below
+    F64_FFT_PLANNER.with(|planner| {
+        let mut planner = planner.borrow_mut();
 
-    fft.process(&mut xx);
+        let fft = planner.plan_fft_forward(xx.len());
+        // let ifft = planner.plan_fft_inverse(xx.len()); see below
 
-    for x in xx.iter_mut() {
-        *x = *x * x.conj();
-    }
+        fft.process(&mut xx);
 
-    // NOTE: since we expect a real output, we can use fft instead of ifft
-    // and save some resources
-    fft.process(&mut xx);
+        for x in xx.iter_mut() {
+            *x = *x * x.conj();
+        }
 
-    // take real part and normalize
-    let xx = xx.iter().map(|x| x.re / xx[0].re).take(N);
+        // NOTE: since we expect a real output, we can use fft instead of ifft
+        // and save some resources
+        fft.process(&mut xx);
 
-    // counting factor (N - k)
-    let xx = xx.enumerate().map(|(k, x)| x * N as f64 / (N - k) as f64);
+        // take real part and normalize
+        let xx = xx.iter().map(|x| x.re / xx[0].re).take(N);
 
-    xx.take(N).collect()
+        // counting factor (N - k)
+        let xx = xx.enumerate().map(|(k, x)| x * N as f64 / (N - k) as f64);
+
+        xx.take(N).collect()
+    })
 }
 
 pub fn autocorr_int_inner<'a>(
