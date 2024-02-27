@@ -1,7 +1,5 @@
 #import "../../common-typst/defs.typ": *
 
-#let xtasks = yaml("/mod_1/xtask.yaml")
-
 #appendix(label: "extending-results-with-reweighting")[
     Extending results with reweighting
 ][
@@ -155,7 +153,7 @@
     #figure(
         image("/mod_1/img/plots/reweighting-failure.svg", width: 50%),
         caption: [
-            example #footnote(raw(xtasks.reweighting-failure, block: false, lang: "sh")) of reweighting failure.
+            example #footnote(mod_1-command("run reweighting-failure")) of reweighting failure.
         ]
     ) <reweighting-failure>
 

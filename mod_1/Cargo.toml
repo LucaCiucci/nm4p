@@ -7,4 +7,4 @@ edition = "2021"
 
 [dependencies]
 nm4p-common = { path = "../common" }
-plotters = "0.3.5"
+plotters = { workspace = true }

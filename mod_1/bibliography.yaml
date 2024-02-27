@@ -1,4 +1,3 @@
-
 metropolis-orig:
   # TODO non sono sicuro che sia l'articolo giusto, mi pare che avevo
   # preso questa referenza da wikipedia
@@ -16,7 +15,7 @@ metropolis-hastings:
   #url: https://arxiv.org/pdf/1504.01896.pdf
 
 autocorr_fft_wikipedia:
-  type: Webpage
+  type: web
   title: Autocorrelation - Efficient computation
   url: https://en.wikipedia.org/wiki/Autocorrelation#Efficient_computation
 
@@ -32,18 +31,18 @@ book-back-matter-fourier-analysis:
 
 
 rustfft:
-  type: Webpage
+  type: web
   title: RustFFT
   url: https://docs.rs/rustfft/6.1.0/rustfft/
 
 levenberg-marquardt:
   type: Article
   title: The Levenberg-Marquardt algorithm for nonlinear least squares curve-fitting problems
-  date: 2022/11/27
+  date: 2022-11-27
   url: https://people.duke.edu/~hpgavin/ExperimentalSystems/lm.pdf
 
 autocorr-daniel:
-  type: Webpage
+  type: web
   author: Daniel Foreman-Mackey
   title: Autocorrelation time estimation
   date: "2017-10-16"
@@ -62,7 +61,7 @@ ensemble-sampler-section-5:
     - Jonathan Weare
 
 Berg-lecturenotes-7-MCMC-III-p7:
-  type: Webpage
+  type: web
   title: Lecturenotes 7 MCMC III
   author: Bernd Albert Berg
   url: http://www.hep.fsu.edu/~berg/teach/mcmc08/material/lecture07mcmc3.pdf#page=7
@@ -87,21 +86,21 @@ efficient-autocorrelation-spectra:
   url: https://arxiv.org/abs/1810.05079
 
 betanalpha-mcmc-in-practice:
-  type: Webpage
+  type: web
   title: Markov Chain Monte Carlo in Practice
   author: Michael Betancourt
-  date: 2020/05
+  date: 2020-05
   url: https://betanalpha.github.io/assets/case_studies/markov_chain_monte_carlo.html
 
 chebyshev-wikipedia:
-  type: Webpage
+  type: web
   title: Chebyshev inequality #Čebyšëv inequality
   url: https://en.wikipedia.org/wiki/Chebyshev%27s_inequality
 
 stochastic-ADMC:
   type: Article
   title: Stochastic automatic differentiation for Monte Carlo processes
-  date: 2023/7/28
+  date: 2023-7-28
   author: [Guilherme Catumba, Alberto Ramos, Bryan Zaldivar]
   url: https://arxiv.org/abs/2307.15406
   doi: 10.48550/arXiv.2307.15406

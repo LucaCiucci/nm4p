@@ -1,7 +1,5 @@
 #import "../../common-typst/defs.typ": *
 
-#let xtasks = yaml("/mod_1/xtask.yaml")
-
 #appendix(label: "IAT")[Integrated Autocorrelation Time][
 
     Siamo solitamente interessati a stimare valori di aspettazione con delle medie campionarie, per questo è necessario associare un'incertezza statisticamente significativa a tali valori.
@@ -54,7 +52,7 @@
     #figure(
         image("/mod_1/img/plots/autocorr-int.svg", width: 50%),
         caption: [
-            Tempo di autocorrelazione integrato in funzione di $M$ #footnote(raw(xtasks.autocorr-int, block: false, lang: "sh")).
+            Tempo di autocorrelazione integrato in funzione di $M$ #footnote(mod_1-command("run autocorr-int")).
         ]
     )
 
@@ -70,7 +68,7 @@
             image("/mod_1/img/plots/autocorr-int-full-corrected.svg", width: 50%),
         ),
         caption: [
-            Tempo di autocorrelazione integrato in funzione di $M$ per $M = 1..N$ tramite la definizione @tau-int-basic (a) #footnote(raw(xtasks.autocorr-int-full, block: false, lang: "sh")) e @tau-int-corrected (b) #footnote(raw(xtasks.autocorr-int-full-corrected, block: false, lang: "sh")).
+            Tempo di autocorrelazione integrato in funzione di $M$ per $M = 1..N$ tramite la definizione @tau-int-basic (a) #footnote(mod_1-command("run autocorr-int-full")) e @tau-int-corrected (b) #footnote(mod_1-command("run autocorr-int-full-corrected")).
         ]
     ) <autocorr-int-full>
     Come si vede da @autocorr-int-full, per entrambi le definizioni, il tempo di autocorrelazione integrato non si stabilizza per grandi $M$. Si potrebbe pensare di fare un fit diminuendo il peso dei punti con $M$ grande, ma questo ha problemi simili ad un eventuale fit delle autocorrelazioni (vedi @autocorrelation) ed inoltre non è vero, in generale, che le $c_k$ siano dominate da un singolo andamento esponenziale in quanto possono essere presenti più scale di correlazione, e noi non siamo interessati a nessuna di queste, neanche $tau_"exp"$.
@@ -111,7 +109,7 @@
             stack(image("/mod_1/img/plots/autocorr-int-algo-int.svg", width: 50%), [(b)]),
         ),
         caption: [
-            Esempio dell'output dell'algoritmo @alg-estimate-M applicato ad una serie di autocorrelazioni proveniente dall'algoritmo di metropolis su distribuzione gaussiana #footnote(raw(xtasks.autocorr-int-algo, block: false, lang: "sh")). La linea rossa rappresenta $M$. In (a) sono riportati i $c_k$ mentre in (b) i corrispondenti $tau_"int" (M)$.
+            Esempio dell'output dell'algoritmo @alg-estimate-M applicato ad una serie di autocorrelazioni proveniente dall'algoritmo di metropolis su distribuzione gaussiana #footnote(mod_1-command("run autocorr-int-algo")). La linea rossa rappresenta $M$. In (a) sono riportati i $c_k$ mentre in (b) i corrispondenti $tau_"int" (M)$.
         ]
     ) <autocorr-int-algo-out>
 
@@ -147,7 +145,7 @@
             stack(image("/mod_1/img/plots/autocorr-int-algo-deriv-int.svg", width: 50%), [(b)]),
         ),
         caption: [
-            Esempio dell'output dell'algoritmo @alg-estimate-M-deriv applicato come in @autocorr-int-algo-out #footnote(raw(xtasks.autocorr-int-algo-deriv, block: false, lang: "sh")). La linea rossa rappresenta $M$. In (a) sono riportati i $c_k$ mentre in (b) i corrispondenti $tau_"int" (M)$.
+            Esempio dell'output dell'algoritmo @alg-estimate-M-deriv applicato come in @autocorr-int-algo-out #footnote(mod_1-command("run autocorr-int-algo-deriv")). La linea rossa rappresenta $M$. In (a) sono riportati i $c_k$ mentre in (b) i corrispondenti $tau_"int" (M)$.
         ]
     ) <autocorr-int-algo-out-deriv>
 
@@ -164,7 +162,7 @@
     #figure(
         image("/mod_1/img/plots/autocorr-int-finder-tau_int-vs-iter.svg", width: 50%),
         caption: [
-            Andamento dei tempi di autocorrelazione integrati in funzione di $N$ per entrambi gli algoritmi #footnote(raw(xtasks.autocorr-int-finder-tau_int-vs-iter, block: false, lang: "sh")). In nero è riportato il risultato e la varianza con $M$ calcolato con@alg-estimate-M mentre in rosso @alg-estimate-M-deriv.
+            Andamento dei tempi di autocorrelazione integrati in funzione di $N$ per entrambi gli algoritmi #footnote(mod_1-command("run autocorr-int-finder-tau_int-vs-iter")). In nero è riportato il risultato e la varianza con $M$ calcolato con@alg-estimate-M mentre in rosso @alg-estimate-M-deriv.
         ]
     ) <autocorr-int-finder-tau_int-vs-iter>
 
@@ -215,7 +213,7 @@
     #figure(
         image("/mod_1/img/plots/metrogauss-tau_vs_acc.svg", width: 50%),
         caption: [
-            Tempo di autocorrelazione integrato in funzione del rate di accettazione per l'algoritmo di metropolis applicato alla distribuzione gaussiana #footnote(raw(xtasks.metrogauss-tau_vs_acc, block: false, lang: "sh")).
+            Tempo di autocorrelazione integrato in funzione del rate di accettazione per l'algoritmo di metropolis applicato alla distribuzione gaussiana #footnote(mod_1-command("run metrogauss-tau_vs_acc")).
         ]
     ) <metrogauss-tau_vs_acc>
 
@@ -306,7 +304,7 @@
         image("/mod_1/img/plots/binning.svg", width: 50%),
         caption: [
             Tipical trend of $tau_"int"$ computed using @binning-tau-int for a dataset with exponential autocorrelation @test-dataset-exp-correlation.
-            The variance is estimated by repeating the binning process multiple times and computing the variance of the results. #footnote(raw(xtasks.binning, block: false, lang: "sh")).
+            The variance is estimated by repeating the binning process multiple times and computing the variance of the results. #footnote(mod_1-command("run binning")).
         ]
     ) <binning-trend>
 
@@ -320,7 +318,7 @@
     #figure(
         image("/mod_1/img/plots/binning-comparison.svg", width: 50%),
         caption: [
-            Comparison between @binning-tau-int (black) and @binning-tau-int-corrected (blue). We can see that the bias-corrected estimate converges nearly as fast as the explicit autocorrelation factor summation (red). The green line and band is the estimate and variance of the rough estimate @alg-estimate-tau-int. #footnote(raw(xtasks.binning-comparison, block: false, lang: "sh")).
+            Comparison between @binning-tau-int (black) and @binning-tau-int-corrected (blue). We can see that the bias-corrected estimate converges nearly as fast as the explicit autocorrelation factor summation (red). The green line and band is the estimate and variance of the rough estimate @alg-estimate-tau-int. #footnote(mod_1-command("run binning-comparison")).
         ]
     ) <binning-trend-comparison>
 

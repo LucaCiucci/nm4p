@@ -1,5 +1,4 @@
 #import "../../common-typst/defs.typ": *
-#let xtasks = yaml("/mod_1/xtask.yaml")
 
 #appendix(label: "autocorrelazione-fft")[Calcolo delle autocorrelazioni tramite FFT][
 
@@ -111,7 +110,7 @@
             image("/mod_1/img/plots/autocorr_plain-log.svg", width: 50%),
         ),
         caption: [
-            Esempio #footnote(raw(xtasks.autocorr_plain, block: false, lang: "sh")) di autocorrelazioni calcolate tramite @ck-plain in scala lineare (a) e logaritmica (b)
+            Esempio #footnote(mod_1-command("run autocorr_plain")) di autocorrelazioni calcolate tramite @ck-plain in scala lineare (a) e logaritmica (b)
         ]
     ) <autocorr_plain>
 
@@ -122,7 +121,7 @@
     #figure(
         image("/mod_1/img/plots/autocorr_plain-full.svg", width: 50%),
         caption: [
-            Esempio #footnote(raw(xtasks.autocorr_plain-full, block: false, lang: "sh")) di autocorrelazioni calcolate tramite @ck-plain in scala lineare
+            Esempio #footnote(mod_1-command("run autocorr_plain-full")) di autocorrelazioni calcolate tramite @ck-plain in scala lineare
         ]
     ) <autocorr_plain-full>
 
@@ -191,7 +190,7 @@
             image("/mod_1/img/plots/autocorr_fft-full.svg", width: 50%),
         ),
         caption: [
-            Esempio di autocorrelazioni calcolate tramite @ck-plain (a) e @ck-fft-1d (b) #footnote(raw(xtasks.autocorr_fft-full, block: false, lang: "sh")) in scala lineare. Le differenza massima tra i due metodi è di $1.4 dot 10^(-13)$.
+            Esempio di autocorrelazioni calcolate tramite @ck-plain (a) e @ck-fft-1d (b) #footnote(mod_1-command("run autocorr_fft-full")) in scala lineare. Le differenza massima tra i due metodi è di $1.4 dot 10^(-13)$.
         ]
     ) <confronto-ck-plain-fft>
 

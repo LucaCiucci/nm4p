@@ -1,4 +1,4 @@
-use codici_mod_0::congruent_generator::CongruentGenerator;
+use mod_0::congruent_generator::CongruentGenerator;
 
 fn main() {
     let mut rng = CongruentGenerator::default();

@@ -1,5 +1,4 @@
 #import "../../common-typst/defs.typ": *
-#let xtasks = yaml("/mod_1/xtask.yaml")
 
 #appendix(label: "tau_int-vs-tau_exp")[$tau_"int"$ vs $tau_"exp"$][
 

@@ -9,15 +9,13 @@
     ),
 )
 
-#let xtasks = yaml("xtask.yaml");
-
 #outline(indent: 1em)
 
 = Introduzione
 
 In questo progetto, mi sono occupato dell'implementazione e l'applicazione dell'algoritmo di metropolis nel caso monodimensionale e nell'applicazione al modello di Ising 2D.
 
-= Algoritmo di Metropolis-Hastings
+= Algoritmo di Metropolis-Hastings <the-metropolis-hastings-algorithm>
 
 L'algoritmo di metropolis è permette di campionare distribuzioni di probabilità tramite una catena di Markov. E' un approccio indiretto per le simulazioni di distribuzioni complesse che permetter di superare il problema del "course of dimensionality" incontrato nelle simulazioni dirette.
 
@@ -97,7 +95,7 @@ Per testare l'algoritmo, ho applicato l'algoritmo di Metropolis-Hastings ad una 
 #figure(
     image("img/plots/primo_test_metrogauss.svg", width: 50%),
     caption: [
-        Visualizzazione dell'output dell'algoritmo di Metropolis-Hastings applicato ad una distribuzione gaussiana. Sono stati utilizzati i seguenti parametri: $mu = 10$, $sigma = 1$, $x_0 = 0$, $delta = 1$, $N = 1000$ #footnote(raw(xtasks.primo_test_metrogauss, block: false, lang: "sh")).
+        Visualizzazione dell'output dell'algoritmo di Metropolis-Hastings applicato ad una distribuzione gaussiana. Sono stati utilizzati i seguenti parametri: $mu = 10$, $sigma = 1$, $x_0 = 0$, $delta = 1$, $N = 1000$ #footnote(mod_1-command("run primo_test_metrogauss")).
     ]
 ) <primo_test_metrogauss>
 
@@ -106,7 +104,7 @@ Come si vede in @primo_test_metrogauss l'algoritmo produce una sequenza di valor
 #figure(
     image("img/plots/primo_test_metrogauss-skip.svg", width: 50%),
     caption: [
-        Output dell'algoritmo con gli stessi parametri di @primo_test_metrogauss-skip ma con un offset di $10^6$ iterazioni #footnote(raw(xtasks.primo_test_metrogauss-skip, block: false, lang: "sh")).
+        Output dell'algoritmo con gli stessi parametri di @primo_test_metrogauss-skip ma con un offset di $10^6$ iterazioni #footnote(mod_1-command("run primo_test_metrogauss-skip")).
     ]
 ) <primo_test_metrogauss-skip>
 
@@ -121,7 +119,7 @@ Per valutare l'efficienza dell'algoritmo, è utile calcolare la percentuale di a
         stack(image("img/plots/metrogauss-high-delta.svg", width: 50%), [(b)]),
     ) + stack(image("img/plots/primo_test_metrogauss-skip.svg", width: 50%), [(c)]),
     caption: [
-        Output dell'algoritmo per due diversi $delta$: $delta = 0.1$ in (a)#footnote(raw(xtasks.metrogauss-low-delta, block: false, lang: "sh")) e $delta = 50$ in (b)#footnote(raw(xtasks.metrogauss-high-delta, block: false, lang: "sh")). (c) è corrisponde agli stessi parametri di @primo_test_metrogauss-skip\
+        Output dell'algoritmo per due diversi $delta$: $delta = 0.1$ in (a)#footnote(mod_1-command("run metrogauss-low-delta")) e $delta = 50$ in (b)#footnote(mod_1-command("run metrogauss-high-delta")). (c) è corrisponde agli stessi parametri di @primo_test_metrogauss-skip\
         In entrambi i casi si osserva che il tempo di correlazione diventa grande per tali parametri, mentre nel caso (c) in cui $delta = 1$ che è dello stesso ordine di grandezza della deviazione standard della distribuzione target, il tempo di correlazione è molto più basso.
     ],
     // TODO placement: auto,
@@ -137,7 +135,7 @@ La dipendenza dei tempi di correlazione di $delta$ verrà analizzata in @autocor
     ),
     caption: [
         Rate di accettazione in funzione di $delta$ in scala lineare (a) e logaritmica (b)
-        #footnote(raw(xtasks.metrogauss-acceptance, block: false, lang: "sh"))
+        #footnote(mod_1-command("run metrogauss-acceptance"))
     ]
 )
 
@@ -175,7 +173,7 @@ Un tipico grafico delle autocorrelazioni per l'algoritmo di metropolis applicato
 #figure(
     image("img/plots/autocorr_fft-typical.svg", width: 50%),
     caption: [
-        Esempio di autocorrelazioni calcolate tramite @ck-fft-1d #footnote(raw(xtasks.autocorr_fft-typical, block: false, lang: "sh")).
+        Esempio di autocorrelazioni calcolate tramite @ck-fft-1d #footnote(mod_1-command("run autocorr_fft-typical")).
     ]
 ) <autocorr-typical>
 

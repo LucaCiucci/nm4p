@@ -1,4 +1,4 @@
-use codici_mod_0::ran::*;
+use mod_0::ran::*;
 
 fn main() {
     //let mut ran = Ran1::default();

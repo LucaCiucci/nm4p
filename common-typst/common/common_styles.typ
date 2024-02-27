@@ -1,4 +1,14 @@
 
+#let maybe-ref(target) = locate(loc => {
+    let r = query(target, loc);
+    let found = r.len() > 0;
+    if found {
+      //type(ref(target))
+      ref(target)
+    } else {
+      target
+    }
+})
 
 #let common_styles(
   body
@@ -60,6 +70,21 @@
   //  //[#("bob-" + perc)\
   //  //]
   //}
+
+  //let ref(target, supplement) = {
+  //  let found = locate(loc => {
+  //    let r = query(target, loc)
+  //    r.len() > 0
+  //  })
+  //  [#found]
+  //  if found {
+  //    ref(target, supplement)
+  //  } else {
+  //    [ERROR]
+  //  }
+  //}
+
+  show ref.where(supplement: [?]): r => maybe-ref(r.target)
 
   body
 }

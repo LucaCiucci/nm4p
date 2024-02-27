@@ -50,3 +50,5 @@
     let (x, err) = round_with_err(x, err);
     $#x plus.minus #err$
 }
+
+#let mod_1-command = (command) => raw("nu mod_1/tasks.nu " + command, block: false, lang: "sh")
