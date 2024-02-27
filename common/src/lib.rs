@@ -6,11 +6,15 @@ pub use rustfft;
 pub use yaml_rust;
 pub use num_traits;
 pub use differential;
+pub use serde;
+pub use serde_json;
+pub use serde_yaml;
 
 use std::ops::Deref;
 
 pub mod stat;
 pub mod interpolation;
+pub mod data_stream;
 
 pub struct Immutable<T> {
     value: T,
