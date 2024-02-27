@@ -99,7 +99,7 @@ impl<S: LatticeStructure> Lattice<S> {
 
     pub fn metropolis_macro_step<R: Rng>(&mut self, rng: &mut R) -> usize {
         let mut acc = 0;
-        for time_index in (0..self.time_div) {
+        for time_index in 0..self.time_div {
             let mut guesses = S::guesses_for_slice::<R>(self, time_index);
             while let Some(trial) = guesses(self, rng) {
                 let delta_se = S::delta_euclid_action(self, time_index, &trial);

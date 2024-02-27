@@ -5,7 +5,7 @@ members = [
     "mod_0",
     "mod_1",
     "mod_3",
-    "prova_elimina",
+    #"prova_elimina",
     #"dark",
 ]
 default-members = [

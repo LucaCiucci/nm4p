@@ -161,17 +161,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "cl3"
-version = "0.9.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "96fd7abe572cee1c781e3464d5c468e8aee10caaef3ea911aea0dea16414409d"
-dependencies = [
- "libc",
- "opencl-sys",
- "thiserror",
-]
-
-[[package]]
 name = "clap"
 version = "4.4.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -792,25 +781,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3fdb12b2476b595f9358c5161aa467c2438859caa136dec86c26fdd2efe17b92"
 
 [[package]]
-name = "opencl-sys"
-version = "0.2.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e45b6878f1873ce3fba231eab49c0da9505a6241fed9cb390a16ed8e101ab0c4"
-dependencies = [
- "libc",
-]
-
-[[package]]
-name = "opencl3"
-version = "0.9.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a94379feed77f776abb9ea6c678bc5f7f42dda9e3dec0cf2d19d7dab4626b01f"
-dependencies = [
- "cl3",
- "libc",
-]
-
-[[package]]
 name = "paste"
 version = "1.0.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -928,13 +898,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "134c189feb4956b20f6f547d2cf727d4c0fe06722b20a0eec87ed445a97f92da"
 dependencies = [
  "unicode-ident",
-]
-
-[[package]]
-name = "prova_elimina"
-version = "0.1.0"
-dependencies = [
- "opencl3",
 ]
 
 [[package]]
