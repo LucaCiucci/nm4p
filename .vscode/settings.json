@@ -1,5 +1,7 @@
 {
     "cSpell.words": [
+        "bytemuck",
+        "gpgpu",
         "idum",
         "infty",
         "Ising",
@@ -8,6 +10,12 @@
         "Reweighting",
         "rngs",
         "rnmx",
-        "Seedable"
-    ]
+        "Seedable",
+        "unmap",
+        "wgpu",
+        "workgroups"
+    ],
+    "files.exclude": {
+        "**/.git": false
+    }
 }

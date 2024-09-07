@@ -1,47 +1,11 @@
 use std::{borrow::Borrow, cell::RefCell, ops::{Add, AddAssign, Mul, MulAssign}};
 
-use nalgebra::DefaultAllocator;
+use nalgebra::{ComplexField, DefaultAllocator};
 use num_traits::{Float, FromPrimitive};
 use rustfft::FftPlanner;
 
-/// Computes the mean and variance of the iterator.
-///
-/// The variance is defined as:
-/// `E[(X - E[X])^2] = E[X^2] - 2*E[X]*E[X] + E[X]^2 = E[X^2] - E[X]^2`
-#[must_use]
-pub fn mean_var<T, I>(values: I) -> (T, T)
-where
-    T: Float + FromPrimitive,
-    I: IntoIterator<Item = T>,
-{
-    let (sum_x2, sum_x, count) = values.into_iter().fold(
-        (T::zero(), T::zero(), 0usize),
-        |(sum_x2, sum_x, count), x| (sum_x2 + x.powi(2), sum_x + x, count + 1),
-    );
-
-    let count = T::from_usize(count).unwrap();
-
-    let e_x2 = sum_x2 / count;
-    let e_x = sum_x / count;
-
-    (
-        e_x,
-        (e_x2 - e_x.powi(2)) * count / (count - T::from_usize(1).unwrap()),
-    ) // TODO this is wrong! this is biased. Must use Bessel's correction
-      //(e_x, e_x2 - e_x.powi(2)) // TODO this is wrong! this is biased. Must use Bessel's correction
-}
-
-/// Computes the variance of the iterator.
-///
-/// See [`mean_var`] for more details.
-#[must_use]
-pub fn var<T, I>(values: I) -> T
-where
-    T: Float + FromPrimitive,
-    I: IntoIterator<Item = T>,
-{
-    mean_var(values).1
-}
+mod var; pub use var::*;
+mod propagation; pub use propagation::*;
 
 pub fn autocorr_plain<'a>(x: &'a [f64]) -> impl Iterator<Item = f64> + 'a {
     #[allow(non_snake_case)]
@@ -235,7 +199,20 @@ where
         }
     }
 
-    let mut bins = Vec::<Bin>::new();
+    let x = x.into_iter();
+    let upper_size_hint = x.size_hint().1;
+
+    let mut bins = if let Some(upper_size_hint) = upper_size_hint {
+        let todo_warning_placeholder = ();
+
+        //Vec::with_capacity((upper_size_hint as f32).log2().ceil() as usize + 1) // TODO log2 on float might be slow, maybe I could iterate and divide by two or watch the first non-zero bit, maybe there is something in the standard library...
+        // TODO take a look at ilog2!!!! (see https://stackoverflow.com/a/77363420)
+
+        let estimated_bins = (upper_size_hint.ilog2() + 1) + 1;
+        Vec::with_capacity(estimated_bins as usize)
+    } else {
+        Vec::<Bin>::new()
+    };
 
     fn get_bin_at(bins: &mut Vec<Bin>, index: usize, k: usize) -> &mut Bin {
         assert!(index <= bins.len());
@@ -340,106 +317,9 @@ pub fn ess_over_n_from_tau_int(tau_int: f64) -> f64 {
     tau_int * 2.0 + 1.0
 }
 
-/// Computes the covariance matrix of a function
-///
-/// Given a function `f` and its jacobian matrix `j`, this function computes the covariance matrix of the output values:  
-/// `Cov_f = j * sigma * jᵗ`  
-/// where `sigma` is the covariance matrix of the input values, `j` is the jacobian matrix of the function and `jᵗ` is the transpose of the jacobian matrix.
-///
-/// # Arguments
-/// * `j` - The jacobian matrix of the function
-/// * `sigma` - The covariance matrix of the input values
-///
-/// # Example
-/// ```
-/// # use nalgebra::*;
-/// # use nm4p_common::stat::*;
-/// // f(x, y) = (x + y) / 2
-/// // j = (1/2, 1/2)
-/// let j = Matrix1x2::new(0.5, 0.5);
-/// let sigma = Matrix2::new(
-///     1.0, -1.0,
-///     -1.0, 3.0,
-/// );
-/// let cov = propagate_cov_matrix(&j, &sigma);
-/// assert_eq!(cov, Matrix1::new(0.5)); // TODO check this value
-/// ```
-///
-/// # Remarks
-/// The jacobian number of rows equals the number of output values, while the number of columns equals the number of input values.
-///
-/// # Panics
-/// Panics if the number of columns of `j` is different from the number of rows of `sigma`.
-pub fn propagate_cov_matrix<T, M, N, JStorage, CStorage>(
-    #[allow(non_snake_case)]
-    jacobian: &nalgebra::Matrix<T, N, M, JStorage>,
-    sigma: &nalgebra::Matrix<T, M, M, CStorage>,
-) -> nalgebra::Matrix<T, N, N, <DefaultAllocator as nalgebra::allocator::Allocator<T, N, N>>::Buffer>
-where
-    T: Clone + nalgebra::Scalar + AddAssign + Add + Mul + MulAssign + num_traits::Zero + num_traits::One + std::fmt::Debug,
-    M: nalgebra::Dim,
-    N: nalgebra::Dim,
-    JStorage: nalgebra::Storage<T, N, M>,
-    CStorage: nalgebra::Storage<T, M, M>,
-    nalgebra::DefaultAllocator: nalgebra::allocator::Allocator<T, N, N>,
-    nalgebra::DefaultAllocator: nalgebra::allocator::Allocator<T, M, N>,
-    nalgebra::DefaultAllocator: nalgebra::allocator::Allocator<T, N, M>,
-{
-    assert_eq!(jacobian.ncols(), sigma.nrows(), "function parameters and covariance matrix size mismatch");
-
-    // TODO transpose will allocate a new matrix, we should avoid it maybe by using a view
-    // TODO as an optimization, maybe we could avoid producing the intermediate
-    // and transposed matrix and just explicitly implement the multiplication?
-
-    // For performance reasons, we associate the matrix multiplication in order to
-    // reduce the intermediate memory allocation.
-    if jacobian.nrows() < jacobian.ncols() {
-        /*
-              J     *      𝜎      *  Jᵗ   =     J𝜎      *  Jᵗ
-                      /xxxxxxxxx\   /xx\                  /xx\
-        /xxxxxxxxxx\ | xxxxxxxxx | | xx |   /xxxxxxxxxx\ | xx |
-        \xxxxxxxxxx/ | xxxxxxxxx | | xx | = \xxxxxxxxxx/ | xx |
-                     | xxxxxxxxx | | xx |                | xx |
-                      \xxxxxxxxx/   \xx/                  \xx/
-           n x m         m x m     m x n      n x m      m x n
-        */
-        (jacobian * sigma) * jacobian.transpose()
-    } else {
-        /*
-          J    *  𝜎  *     Jᵗ      =   J   *      𝜎Jᵗ
-         /xx\                         /xx\
-        | xx |   /xx\ /xxxxxxxxxx\   | xx |  /xxxxxxxxxx\
-        | xx |   \xx/ \xxxxxxxxxx/ = | xx |  \xxxxxxxxxx/
-        | xx |                       | xx |
-         \xx/                         \xx/
-        n x m   m x m    m x n       n x m      m x n
-        */
-        jacobian * (sigma * jacobian.transpose())
-    }
-}
-
 #[cfg(test)]
 mod tests {
-    #[test]
-    fn propagate_cov_matrix() {
-        use nalgebra::*;
-
-        // identity: f(x, y) = (x; y)
-        let j = Matrix2::identity();
-        let sigma = Matrix2::new(
-            1.0, 0.1,
-            1.0, 0.1,
-        );
-        let cov = super::propagate_cov_matrix(&j, &sigma);
-        assert_eq!(cov, sigma);
-
-        // f(x, y) = 2 * x + 3 * y
-        let j = Matrix1x2::new(2.0, 3.0);
-        let sigma = Matrix2::new(
-            5.0, 11.0,
-            11.0, 7.0,
-        );
-        let cov = super::propagate_cov_matrix(&j, &sigma);
-        assert_eq!(cov, Matrix1::new(215.0)); // TODO check this value
-    }
+    use super::*;
+    //use nalgebra::ComplexField;
+    use rand::prelude::*;
 }

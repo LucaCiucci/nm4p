@@ -15,6 +15,7 @@ use std::ops::Deref;
 pub mod stat;
 pub mod interpolation;
 pub mod data_stream;
+pub mod gpgpu;
 
 pub struct Immutable<T> {
     value: T,
