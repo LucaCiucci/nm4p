@@ -1,0 +1,3 @@
+[submodule "report/styles/custom-typst"]
+	path = report/styles/custom-typst
+	url = https://github.com/LucaCiucci/custom-typst
