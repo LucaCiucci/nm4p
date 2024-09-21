@@ -1,0 +1,11 @@
+[package]
+name = "mod_1"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = { workspace = true }
+nm4p-common = { workspace = true }
+clap = { workspace = true }
+rand = { workspace = true }
+serde = { workspace = true }

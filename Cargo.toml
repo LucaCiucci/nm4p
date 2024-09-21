@@ -1,0 +1,21 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/common",
+    "crates/mod_0",
+    "crates/mod_1",
+]
+default-members = [
+    "crates/mod_0",
+    "crates/mod_1",
+]
+
+
+[workspace.dependencies]
+anyhow = { version = "1.0.89" }
+nm4p-common = { path = "crates/common" }
+clap = { version = "4.5.18", features = ["derive"] }
+rand = "0.8.5"
+serde = { version = "1.0.210", features = ["derive"] }
+serde_yaml = "0.9.34"
+serde_json = "1.0.128"
