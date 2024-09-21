@@ -1,0 +1,4 @@
+set shell := ["nu", "-c"]
+
+metrogauss:
+    nu metrogauss/plot-all.nu

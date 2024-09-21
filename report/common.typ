@@ -1,6 +1,17 @@
 #import "@preview/lovelace:0.3.0": pseudocode-list
 #import "custom-typst/boxes.typ": *
 
+#let maybe-ref(target) = locate(loc => {
+    let r = query(target, loc);
+    let found = r.len() > 0;
+    if found {
+      //type(ref(target))
+      ref(target)
+    } else {
+      target
+    }
+})
+
 #let comment(body) = emph(text(green, "# " + body))
 
 #let pseudo(..args) = {

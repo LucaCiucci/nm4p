@@ -3,6 +3,8 @@
 
 #show: common-styles
 
+#set text(lang: "it")
+
 = Ciao
 
 ciao
@@ -16,3 +18,9 @@ fn ciao() {
     println!("ciao");
 }
 ```
+
+#outline()
+
+#pagebreak()
+
+#include "mod_1/mod.typ"

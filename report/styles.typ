@@ -78,6 +78,7 @@
   //}
   // 
 
+  import "common.typ": maybe-ref
   show ref.where(supplement: [?]): r => maybe-ref(r.target)
 
   // Typing `#"---"` will now span a horizontal line

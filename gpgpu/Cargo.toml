@@ -1,0 +1,18 @@
+[package]
+name = "nm4p-gpgpu"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bytemuck.workspace = true
+futures.workspace = true
+wgpu.workspace = true
+#gpp = "0.6.2"
+#tokio = { version = "1.37.0", features = ["full"] }
+#wgpu.workspace = true
+
+[dev-dependencies]
+image.workspace = true
+pollster.workspace = true
+#image = "0.25.2"
+#pollster.workspace = true

@@ -4,18 +4,23 @@ members = [
     "common",
     "mod_0",
     "mod_1",
+    "gpgpu",
 ]
 default-members = [
     "mod_0",
     "mod_1",
 ]
 
-
 [workspace.dependencies]
 anyhow = { version = "1.0.89" }
-nm4p-common = { path = "common" }
+bytemuck = "1.18.0"
 clap = { version = "4.5.18", features = ["derive"] }
+futures = "0.3.30"
+image = "0.25.2"
+nm4p-common = { path = "common" }
+pollster = "0.3.0"
 rand = "0.8.5"
 serde = { version = "1.0.210", features = ["derive"] }
-serde_yaml = "0.9.34"
 serde_json = "1.0.128"
+serde_yaml = "0.9.34"
+wgpu = "22.1.0"

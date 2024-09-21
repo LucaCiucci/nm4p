@@ -4,4 +4,4 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-nm4p-common = { workspace = true }
+nm4p-common.workspace = true

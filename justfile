@@ -1,16 +1,14 @@
 set shell := ["nu", "-c"]
 
 default:
-    just --list
+    @just --list
 
 build:
     @cargo build --workspace
 
-hello:
-    @cargo run --quiet --bin hello
-
 test:
     @cargo test --workspace
 
+# run a binary in the workspace
 run BIN *ARGS:
-    cargo run --quiet -p mod_1 --bin {{ BIN }} -- {{ ARGS }}
+    @cargo run --quiet --bin {{ BIN }} -- {{ ARGS }}
