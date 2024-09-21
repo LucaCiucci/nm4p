@@ -1,8 +1,0 @@
-[package]
-name = "mod_0"
-version = "0.1.0"
-edition = "2021"
-authors = ["Luca Ciucci"]
-
-[dependencies]
-nm4p-common = { path = "../common" }
